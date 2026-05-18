@@ -11,7 +11,10 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as HotelsIndexRouteImport } from './routes/hotels/index'
+import { Route as BookingIndexRouteImport } from './routes/booking/index'
 import { Route as HotelsHotelIdRouteImport } from './routes/hotels/$hotelId'
+import { Route as BookingSuccessRouteImport } from './routes/booking/success'
+import { Route as BookingFailedRouteImport } from './routes/booking/failed'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -23,39 +26,85 @@ const HotelsIndexRoute = HotelsIndexRouteImport.update({
   path: '/hotels/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BookingIndexRoute = BookingIndexRouteImport.update({
+  id: '/booking/',
+  path: '/booking/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const HotelsHotelIdRoute = HotelsHotelIdRouteImport.update({
   id: '/hotels/$hotelId',
   path: '/hotels/$hotelId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BookingSuccessRoute = BookingSuccessRouteImport.update({
+  id: '/booking/success',
+  path: '/booking/success',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BookingFailedRoute = BookingFailedRouteImport.update({
+  id: '/booking/failed',
+  path: '/booking/failed',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/booking/failed': typeof BookingFailedRoute
+  '/booking/success': typeof BookingSuccessRoute
   '/hotels/$hotelId': typeof HotelsHotelIdRoute
+  '/booking/': typeof BookingIndexRoute
   '/hotels/': typeof HotelsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/booking/failed': typeof BookingFailedRoute
+  '/booking/success': typeof BookingSuccessRoute
   '/hotels/$hotelId': typeof HotelsHotelIdRoute
+  '/booking': typeof BookingIndexRoute
   '/hotels': typeof HotelsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/booking/failed': typeof BookingFailedRoute
+  '/booking/success': typeof BookingSuccessRoute
   '/hotels/$hotelId': typeof HotelsHotelIdRoute
+  '/booking/': typeof BookingIndexRoute
   '/hotels/': typeof HotelsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/hotels/$hotelId' | '/hotels/'
+  fullPaths:
+    | '/'
+    | '/booking/failed'
+    | '/booking/success'
+    | '/hotels/$hotelId'
+    | '/booking/'
+    | '/hotels/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/hotels/$hotelId' | '/hotels'
-  id: '__root__' | '/' | '/hotels/$hotelId' | '/hotels/'
+  to:
+    | '/'
+    | '/booking/failed'
+    | '/booking/success'
+    | '/hotels/$hotelId'
+    | '/booking'
+    | '/hotels'
+  id:
+    | '__root__'
+    | '/'
+    | '/booking/failed'
+    | '/booking/success'
+    | '/hotels/$hotelId'
+    | '/booking/'
+    | '/hotels/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  BookingFailedRoute: typeof BookingFailedRoute
+  BookingSuccessRoute: typeof BookingSuccessRoute
   HotelsHotelIdRoute: typeof HotelsHotelIdRoute
+  BookingIndexRoute: typeof BookingIndexRoute
   HotelsIndexRoute: typeof HotelsIndexRoute
 }
 
@@ -75,6 +124,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HotelsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/booking/': {
+      id: '/booking/'
+      path: '/booking'
+      fullPath: '/booking/'
+      preLoaderRoute: typeof BookingIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/hotels/$hotelId': {
       id: '/hotels/$hotelId'
       path: '/hotels/$hotelId'
@@ -82,12 +138,29 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HotelsHotelIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/booking/success': {
+      id: '/booking/success'
+      path: '/booking/success'
+      fullPath: '/booking/success'
+      preLoaderRoute: typeof BookingSuccessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/booking/failed': {
+      id: '/booking/failed'
+      path: '/booking/failed'
+      fullPath: '/booking/failed'
+      preLoaderRoute: typeof BookingFailedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  BookingFailedRoute: BookingFailedRoute,
+  BookingSuccessRoute: BookingSuccessRoute,
   HotelsHotelIdRoute: HotelsHotelIdRoute,
+  BookingIndexRoute: BookingIndexRoute,
   HotelsIndexRoute: HotelsIndexRoute,
 }
 export const routeTree = rootRouteImport
