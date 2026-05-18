@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TestimonialsRouteImport } from './routes/testimonials'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as RefundRouteImport } from './routes/refund'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as OffersRouteImport } from './routes/offers'
@@ -34,6 +35,11 @@ const TestimonialsRoute = TestimonialsRouteImport.update({
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RefundRoute = RefundRouteImport.update({
@@ -117,6 +123,7 @@ export interface FileRoutesByFullPath {
   '/offers': typeof OffersRoute
   '/privacy': typeof PrivacyRoute
   '/refund': typeof RefundRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/testimonials': typeof TestimonialsRoute
   '/booking/failed': typeof BookingFailedRoute
@@ -135,6 +142,7 @@ export interface FileRoutesByTo {
   '/offers': typeof OffersRoute
   '/privacy': typeof PrivacyRoute
   '/refund': typeof RefundRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/testimonials': typeof TestimonialsRoute
   '/booking/failed': typeof BookingFailedRoute
@@ -154,6 +162,7 @@ export interface FileRoutesById {
   '/offers': typeof OffersRoute
   '/privacy': typeof PrivacyRoute
   '/refund': typeof RefundRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/testimonials': typeof TestimonialsRoute
   '/booking/failed': typeof BookingFailedRoute
@@ -174,6 +183,7 @@ export interface FileRouteTypes {
     | '/offers'
     | '/privacy'
     | '/refund'
+    | '/sitemap.xml'
     | '/terms'
     | '/testimonials'
     | '/booking/failed'
@@ -192,6 +202,7 @@ export interface FileRouteTypes {
     | '/offers'
     | '/privacy'
     | '/refund'
+    | '/sitemap.xml'
     | '/terms'
     | '/testimonials'
     | '/booking/failed'
@@ -210,6 +221,7 @@ export interface FileRouteTypes {
     | '/offers'
     | '/privacy'
     | '/refund'
+    | '/sitemap.xml'
     | '/terms'
     | '/testimonials'
     | '/booking/failed'
@@ -229,6 +241,7 @@ export interface RootRouteChildren {
   OffersRoute: typeof OffersRoute
   PrivacyRoute: typeof PrivacyRoute
   RefundRoute: typeof RefundRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
   TestimonialsRoute: typeof TestimonialsRoute
   BookingFailedRoute: typeof BookingFailedRoute
@@ -252,6 +265,13 @@ declare module '@tanstack/react-router' {
       path: '/terms'
       fullPath: '/terms'
       preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/refund': {
@@ -365,6 +385,7 @@ const rootRouteChildren: RootRouteChildren = {
   OffersRoute: OffersRoute,
   PrivacyRoute: PrivacyRoute,
   RefundRoute: RefundRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
   TestimonialsRoute: TestimonialsRoute,
   BookingFailedRoute: BookingFailedRoute,
