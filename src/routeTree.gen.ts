@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as TestimonialsRouteImport } from './routes/testimonials'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as SignupRouteImport } from './routes/signup'
 import { Route as RefundRouteImport } from './routes/refund'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as OffersRouteImport } from './routes/offers'
@@ -41,6 +42,11 @@ const TermsRoute = TermsRouteImport.update({
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RefundRoute = RefundRouteImport.update({
@@ -130,6 +136,7 @@ export interface FileRoutesByFullPath {
   '/offers': typeof OffersRoute
   '/privacy': typeof PrivacyRoute
   '/refund': typeof RefundRoute
+  '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/testimonials': typeof TestimonialsRoute
@@ -150,6 +157,7 @@ export interface FileRoutesByTo {
   '/offers': typeof OffersRoute
   '/privacy': typeof PrivacyRoute
   '/refund': typeof RefundRoute
+  '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/testimonials': typeof TestimonialsRoute
@@ -171,6 +179,7 @@ export interface FileRoutesById {
   '/offers': typeof OffersRoute
   '/privacy': typeof PrivacyRoute
   '/refund': typeof RefundRoute
+  '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/testimonials': typeof TestimonialsRoute
@@ -193,6 +202,7 @@ export interface FileRouteTypes {
     | '/offers'
     | '/privacy'
     | '/refund'
+    | '/signup'
     | '/sitemap.xml'
     | '/terms'
     | '/testimonials'
@@ -213,6 +223,7 @@ export interface FileRouteTypes {
     | '/offers'
     | '/privacy'
     | '/refund'
+    | '/signup'
     | '/sitemap.xml'
     | '/terms'
     | '/testimonials'
@@ -233,6 +244,7 @@ export interface FileRouteTypes {
     | '/offers'
     | '/privacy'
     | '/refund'
+    | '/signup'
     | '/sitemap.xml'
     | '/terms'
     | '/testimonials'
@@ -254,6 +266,7 @@ export interface RootRouteChildren {
   OffersRoute: typeof OffersRoute
   PrivacyRoute: typeof PrivacyRoute
   RefundRoute: typeof RefundRoute
+  SignupRoute: typeof SignupRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
   TestimonialsRoute: typeof TestimonialsRoute
@@ -285,6 +298,13 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/refund': {
@@ -406,6 +426,7 @@ const rootRouteChildren: RootRouteChildren = {
   OffersRoute: OffersRoute,
   PrivacyRoute: PrivacyRoute,
   RefundRoute: RefundRoute,
+  SignupRoute: SignupRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
   TestimonialsRoute: TestimonialsRoute,
