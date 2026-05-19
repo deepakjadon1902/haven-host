@@ -29,6 +29,7 @@ import { Route as BookingIndexRouteImport } from './routes/booking/index'
 import { Route as HotelsHotelIdRouteImport } from './routes/hotels/$hotelId'
 import { Route as BookingSuccessRouteImport } from './routes/booking/success'
 import { Route as BookingFailedRouteImport } from './routes/booking/failed'
+import { Route as AuthenticatedSavedRouteImport } from './routes/_authenticated/saved'
 import { Route as AuthenticatedBookingsRouteImport } from './routes/_authenticated/bookings'
 import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
 
@@ -131,6 +132,11 @@ const BookingFailedRoute = BookingFailedRouteImport.update({
   path: '/booking/failed',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedSavedRoute = AuthenticatedSavedRouteImport.update({
+  id: '/saved',
+  path: '/saved',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedBookingsRoute = AuthenticatedBookingsRouteImport.update({
   id: '/bookings',
   path: '/bookings',
@@ -159,6 +165,7 @@ export interface FileRoutesByFullPath {
   '/testimonials': typeof TestimonialsRoute
   '/account': typeof AuthenticatedAccountRoute
   '/bookings': typeof AuthenticatedBookingsRoute
+  '/saved': typeof AuthenticatedSavedRoute
   '/booking/failed': typeof BookingFailedRoute
   '/booking/success': typeof BookingSuccessRoute
   '/hotels/$hotelId': typeof HotelsHotelIdRoute
@@ -182,6 +189,7 @@ export interface FileRoutesByTo {
   '/testimonials': typeof TestimonialsRoute
   '/account': typeof AuthenticatedAccountRoute
   '/bookings': typeof AuthenticatedBookingsRoute
+  '/saved': typeof AuthenticatedSavedRoute
   '/booking/failed': typeof BookingFailedRoute
   '/booking/success': typeof BookingSuccessRoute
   '/hotels/$hotelId': typeof HotelsHotelIdRoute
@@ -207,6 +215,7 @@ export interface FileRoutesById {
   '/testimonials': typeof TestimonialsRoute
   '/_authenticated/account': typeof AuthenticatedAccountRoute
   '/_authenticated/bookings': typeof AuthenticatedBookingsRoute
+  '/_authenticated/saved': typeof AuthenticatedSavedRoute
   '/booking/failed': typeof BookingFailedRoute
   '/booking/success': typeof BookingSuccessRoute
   '/hotels/$hotelId': typeof HotelsHotelIdRoute
@@ -232,6 +241,7 @@ export interface FileRouteTypes {
     | '/testimonials'
     | '/account'
     | '/bookings'
+    | '/saved'
     | '/booking/failed'
     | '/booking/success'
     | '/hotels/$hotelId'
@@ -255,6 +265,7 @@ export interface FileRouteTypes {
     | '/testimonials'
     | '/account'
     | '/bookings'
+    | '/saved'
     | '/booking/failed'
     | '/booking/success'
     | '/hotels/$hotelId'
@@ -279,6 +290,7 @@ export interface FileRouteTypes {
     | '/testimonials'
     | '/_authenticated/account'
     | '/_authenticated/bookings'
+    | '/_authenticated/saved'
     | '/booking/failed'
     | '/booking/success'
     | '/hotels/$hotelId'
@@ -451,6 +463,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BookingFailedRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/saved': {
+      id: '/_authenticated/saved'
+      path: '/saved'
+      fullPath: '/saved'
+      preLoaderRoute: typeof AuthenticatedSavedRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/bookings': {
       id: '/_authenticated/bookings'
       path: '/bookings'
@@ -471,11 +490,13 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteChildren {
   AuthenticatedAccountRoute: typeof AuthenticatedAccountRoute
   AuthenticatedBookingsRoute: typeof AuthenticatedBookingsRoute
+  AuthenticatedSavedRoute: typeof AuthenticatedSavedRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAccountRoute: AuthenticatedAccountRoute,
   AuthenticatedBookingsRoute: AuthenticatedBookingsRoute,
+  AuthenticatedSavedRoute: AuthenticatedSavedRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
