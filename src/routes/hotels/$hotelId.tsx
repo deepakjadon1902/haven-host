@@ -58,7 +58,7 @@ function HotelDetailPage() {
       <section className="mx-auto max-w-7xl px-5 lg:px-8 pt-8">
         <div className="grid grid-cols-4 grid-rows-2 gap-2 md:gap-3 rounded-3xl overflow-hidden h-[60vh] min-h-[420px]">
           <img src={hotel.heroImage} alt={hotel.name} className="col-span-4 md:col-span-2 row-span-2 h-full w-full object-cover" />
-          {hotel.gallery.slice(0, 4).map((src, i) => (
+          {hotel.gallery.slice(0, 4).map((src: string, i: number) => (
             <img key={i} src={src} alt="" className="hidden md:block h-full w-full object-cover" />
           ))}
         </div>
@@ -87,7 +87,7 @@ function HotelDetailPage() {
           <p className="mt-8 text-white/80 leading-relaxed max-w-2xl">{hotel.description}</p>
 
           <div className="mt-10 grid sm:grid-cols-2 gap-3">
-            {hotel.highlights.map((h) => (
+            {hotel.highlights.map((h: string) => (
               <div key={h} className="flex items-start gap-3 rounded-2xl border border-white/10 p-4">
                 <Sparkles className="h-5 w-5 text-gold mt-0.5 shrink-0" />
                 <span className="font-medium">{h}</span>
@@ -97,7 +97,7 @@ function HotelDetailPage() {
 
           <h3 className="mt-12 font-display text-xl font-semibold">Amenities</h3>
           <div className="mt-4 flex flex-wrap gap-2">
-            {hotel.amenities.map((a) => (
+            {hotel.amenities.map((a: string) => (
               <span key={a} className="px-3.5 py-1.5 rounded-full text-sm border border-white/10 bg-white/[0.03] flex items-center gap-2">
                 <Wifi className="h-3.5 w-3.5 text-gold" /> {a}
               </span>
@@ -113,7 +113,7 @@ function HotelDetailPage() {
               <span className="text-sm font-medium text-white/55 ml-1">/ night</span>
             </p>
             <div className="mt-6 space-y-3 text-sm">
-              {hotel.roomTypes.map((rt) => (
+              {hotel.roomTypes.map((rt: RoomType) => (
                 <button
                   key={rt.id}
                   onClick={() => setActiveRoom(rt)}
@@ -151,7 +151,7 @@ function HotelDetailPage() {
         <h2 className="mt-3 font-display text-3xl md:text-4xl font-semibold">Pick your room.</h2>
 
         <div className="mt-8 flex gap-2 flex-wrap">
-          {hotel.roomTypes.map((rt) => (
+          {hotel.roomTypes.map((rt: RoomType) => (
             <button
               key={rt.id}
               onClick={() => setActiveRoom(rt)}
