@@ -11,6 +11,8 @@ import {
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { Button } from "@/components/ui/button";
 import { findHotel, findRoomType } from "@/data/hotels";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 type Search = { hotel?: string; room?: string; date?: string };
 
@@ -58,6 +60,7 @@ const steps = ["Stay", "Guests", "Payment"] as const;
 function BookingPage() {
   const search = Route.useSearch();
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const hotel = useMemo(() => (search.hotel ? findHotel(search.hotel) : undefined), [search.hotel]);
   const roomType = useMemo(
@@ -129,21 +132,57 @@ function BookingPage() {
     setStep((s) => Math.min(s + 1, steps.length - 1));
   };
 
-  const onSubmit: SubmitHandler<FormValues> = (data) => {
-    // 80% success rate for demo
-    const ok = Math.random() > 0.2;
-    const ref = "MN-" + Math.random().toString(36).slice(2, 8).toUpperCase();
-    setTimeout(() => {
-      if (ok) {
-        toast.success("Reservation confirmed.");
-        navigate({
-          to: "/booking/success",
-          search: { ref, hotel: hotel?.slug, room: roomType?.id } as never,
-        });
-      } else {
-        navigate({ to: "/booking/failed" });
-      }
-    }, 600);
+  const onSubmit: SubmitHandler<FormValues> = async (data) => {
+    if (!user) {
+      toast.error("Please sign in to confirm your reservation.");
+      navigate({ to: "/login", search: { redirect: "/booking" } as never });
+      return;
+    }
+    if (!hotel || !roomType) return;
+    const checkIn = search.date ?? new Date().toISOString().slice(0, 10);
+    const checkOut = new Date(new Date(checkIn).getTime() + nights * 86400000)
+      .toISOString()
+      .slice(0, 10);
+    const subtotalCents = roomType.pricePerNight * nights * 100;
+    const taxesCents = Math.round(subtotalCents * 0.12);
+    const totalCents = subtotalCents + taxesCents;
+
+    const { data: inserted, error } = await supabase
+      .from("bookings")
+      .insert({
+        user_id: user.id,
+        hotel_slug: hotel.slug,
+        hotel_name: hotel.name,
+        room_type_id: roomType.id,
+        room_type_name: roomType.name,
+        check_in: checkIn,
+        check_out: checkOut,
+        nights,
+        adults: data.adults.length,
+        children: data.children.length,
+        guest_full_name: data.fullName,
+        guest_email: data.email,
+        guest_phone: data.phone,
+        pets_allowed: data.pets === "yes",
+        subtotal_cents: subtotalCents,
+        taxes_cents: taxesCents,
+        total_cents: totalCents,
+        currency: "INR",
+        status: "confirmed",
+      })
+      .select("reference")
+      .single();
+
+    if (error) {
+      toast.error(error.message);
+      navigate({ to: "/booking/failed" });
+      return;
+    }
+    toast.success("Reservation confirmed.");
+    navigate({
+      to: "/booking/success",
+      search: { ref: inserted.reference, hotel: hotel.slug, room: roomType.id } as never,
+    });
   };
 
   if (!hotel || !roomType) {
