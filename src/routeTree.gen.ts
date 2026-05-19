@@ -22,12 +22,14 @@ import { Route as FaqRouteImport } from './routes/faq'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as BlogsRouteImport } from './routes/blogs'
 import { Route as AboutRouteImport } from './routes/about'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as HotelsIndexRouteImport } from './routes/hotels/index'
 import { Route as BookingIndexRouteImport } from './routes/booking/index'
 import { Route as HotelsHotelIdRouteImport } from './routes/hotels/$hotelId'
 import { Route as BookingSuccessRouteImport } from './routes/booking/success'
 import { Route as BookingFailedRouteImport } from './routes/booking/failed'
+import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
 
 const TestimonialsRoute = TestimonialsRouteImport.update({
   id: '/testimonials',
@@ -94,6 +96,10 @@ const AboutRoute = AboutRouteImport.update({
   path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -124,6 +130,11 @@ const BookingFailedRoute = BookingFailedRouteImport.update({
   path: '/booking/failed',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAccountRoute = AuthenticatedAccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -140,6 +151,7 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/testimonials': typeof TestimonialsRoute
+  '/account': typeof AuthenticatedAccountRoute
   '/booking/failed': typeof BookingFailedRoute
   '/booking/success': typeof BookingSuccessRoute
   '/hotels/$hotelId': typeof HotelsHotelIdRoute
@@ -161,6 +173,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/testimonials': typeof TestimonialsRoute
+  '/account': typeof AuthenticatedAccountRoute
   '/booking/failed': typeof BookingFailedRoute
   '/booking/success': typeof BookingSuccessRoute
   '/hotels/$hotelId': typeof HotelsHotelIdRoute
@@ -170,6 +183,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/about': typeof AboutRoute
   '/blogs': typeof BlogsRoute
   '/contact': typeof ContactRoute
@@ -183,6 +197,7 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/testimonials': typeof TestimonialsRoute
+  '/_authenticated/account': typeof AuthenticatedAccountRoute
   '/booking/failed': typeof BookingFailedRoute
   '/booking/success': typeof BookingSuccessRoute
   '/hotels/$hotelId': typeof HotelsHotelIdRoute
@@ -206,6 +221,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terms'
     | '/testimonials'
+    | '/account'
     | '/booking/failed'
     | '/booking/success'
     | '/hotels/$hotelId'
@@ -227,6 +243,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terms'
     | '/testimonials'
+    | '/account'
     | '/booking/failed'
     | '/booking/success'
     | '/hotels/$hotelId'
@@ -235,6 +252,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/_authenticated'
     | '/about'
     | '/blogs'
     | '/contact'
@@ -248,6 +266,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terms'
     | '/testimonials'
+    | '/_authenticated/account'
     | '/booking/failed'
     | '/booking/success'
     | '/hotels/$hotelId'
@@ -257,6 +276,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AboutRoute: typeof AboutRoute
   BlogsRoute: typeof BlogsRoute
   ContactRoute: typeof ContactRoute
@@ -370,6 +390,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -412,11 +439,31 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BookingFailedRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/account': {
+      id: '/_authenticated/account'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AuthenticatedAccountRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
+interface AuthenticatedRouteChildren {
+  AuthenticatedAccountRoute: typeof AuthenticatedAccountRoute
+}
+
+const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedAccountRoute: AuthenticatedAccountRoute,
+}
+
+const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
+  AuthenticatedRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AboutRoute: AboutRoute,
   BlogsRoute: BlogsRoute,
   ContactRoute: ContactRoute,
@@ -439,3 +486,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
