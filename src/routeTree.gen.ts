@@ -12,20 +12,26 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as TestimonialsRouteImport } from './routes/testimonials'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as SignupRouteImport } from './routes/signup'
 import { Route as RefundRouteImport } from './routes/refund'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as OffersRouteImport } from './routes/offers'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as GalleryRouteImport } from './routes/gallery'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as BlogsRouteImport } from './routes/blogs'
 import { Route as AboutRouteImport } from './routes/about'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as HotelsIndexRouteImport } from './routes/hotels/index'
 import { Route as BookingIndexRouteImport } from './routes/booking/index'
 import { Route as HotelsHotelIdRouteImport } from './routes/hotels/$hotelId'
 import { Route as BookingSuccessRouteImport } from './routes/booking/success'
 import { Route as BookingFailedRouteImport } from './routes/booking/failed'
+import { Route as AuthenticatedSavedRouteImport } from './routes/_authenticated/saved'
+import { Route as AuthenticatedBookingsRouteImport } from './routes/_authenticated/bookings'
+import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
 
 const TestimonialsRoute = TestimonialsRouteImport.update({
   id: '/testimonials',
@@ -42,6 +48,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RefundRoute = RefundRouteImport.update({
   id: '/refund',
   path: '/refund',
@@ -55,6 +66,11 @@ const PrivacyRoute = PrivacyRouteImport.update({
 const OffersRoute = OffersRouteImport.update({
   id: '/offers',
   path: '/offers',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GalleryRoute = GalleryRouteImport.update({
@@ -80,6 +96,10 @@ const BlogsRoute = BlogsRouteImport.update({
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -112,6 +132,21 @@ const BookingFailedRoute = BookingFailedRouteImport.update({
   path: '/booking/failed',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedSavedRoute = AuthenticatedSavedRouteImport.update({
+  id: '/saved',
+  path: '/saved',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedBookingsRoute = AuthenticatedBookingsRouteImport.update({
+  id: '/bookings',
+  path: '/bookings',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedAccountRoute = AuthenticatedAccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -120,12 +155,17 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
   '/gallery': typeof GalleryRoute
+  '/login': typeof LoginRoute
   '/offers': typeof OffersRoute
   '/privacy': typeof PrivacyRoute
   '/refund': typeof RefundRoute
+  '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/testimonials': typeof TestimonialsRoute
+  '/account': typeof AuthenticatedAccountRoute
+  '/bookings': typeof AuthenticatedBookingsRoute
+  '/saved': typeof AuthenticatedSavedRoute
   '/booking/failed': typeof BookingFailedRoute
   '/booking/success': typeof BookingSuccessRoute
   '/hotels/$hotelId': typeof HotelsHotelIdRoute
@@ -139,12 +179,17 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
   '/gallery': typeof GalleryRoute
+  '/login': typeof LoginRoute
   '/offers': typeof OffersRoute
   '/privacy': typeof PrivacyRoute
   '/refund': typeof RefundRoute
+  '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/testimonials': typeof TestimonialsRoute
+  '/account': typeof AuthenticatedAccountRoute
+  '/bookings': typeof AuthenticatedBookingsRoute
+  '/saved': typeof AuthenticatedSavedRoute
   '/booking/failed': typeof BookingFailedRoute
   '/booking/success': typeof BookingSuccessRoute
   '/hotels/$hotelId': typeof HotelsHotelIdRoute
@@ -154,17 +199,23 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/about': typeof AboutRoute
   '/blogs': typeof BlogsRoute
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
   '/gallery': typeof GalleryRoute
+  '/login': typeof LoginRoute
   '/offers': typeof OffersRoute
   '/privacy': typeof PrivacyRoute
   '/refund': typeof RefundRoute
+  '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/testimonials': typeof TestimonialsRoute
+  '/_authenticated/account': typeof AuthenticatedAccountRoute
+  '/_authenticated/bookings': typeof AuthenticatedBookingsRoute
+  '/_authenticated/saved': typeof AuthenticatedSavedRoute
   '/booking/failed': typeof BookingFailedRoute
   '/booking/success': typeof BookingSuccessRoute
   '/hotels/$hotelId': typeof HotelsHotelIdRoute
@@ -180,12 +231,17 @@ export interface FileRouteTypes {
     | '/contact'
     | '/faq'
     | '/gallery'
+    | '/login'
     | '/offers'
     | '/privacy'
     | '/refund'
+    | '/signup'
     | '/sitemap.xml'
     | '/terms'
     | '/testimonials'
+    | '/account'
+    | '/bookings'
+    | '/saved'
     | '/booking/failed'
     | '/booking/success'
     | '/hotels/$hotelId'
@@ -199,12 +255,17 @@ export interface FileRouteTypes {
     | '/contact'
     | '/faq'
     | '/gallery'
+    | '/login'
     | '/offers'
     | '/privacy'
     | '/refund'
+    | '/signup'
     | '/sitemap.xml'
     | '/terms'
     | '/testimonials'
+    | '/account'
+    | '/bookings'
+    | '/saved'
     | '/booking/failed'
     | '/booking/success'
     | '/hotels/$hotelId'
@@ -213,17 +274,23 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/_authenticated'
     | '/about'
     | '/blogs'
     | '/contact'
     | '/faq'
     | '/gallery'
+    | '/login'
     | '/offers'
     | '/privacy'
     | '/refund'
+    | '/signup'
     | '/sitemap.xml'
     | '/terms'
     | '/testimonials'
+    | '/_authenticated/account'
+    | '/_authenticated/bookings'
+    | '/_authenticated/saved'
     | '/booking/failed'
     | '/booking/success'
     | '/hotels/$hotelId'
@@ -233,14 +300,17 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AboutRoute: typeof AboutRoute
   BlogsRoute: typeof BlogsRoute
   ContactRoute: typeof ContactRoute
   FaqRoute: typeof FaqRoute
   GalleryRoute: typeof GalleryRoute
+  LoginRoute: typeof LoginRoute
   OffersRoute: typeof OffersRoute
   PrivacyRoute: typeof PrivacyRoute
   RefundRoute: typeof RefundRoute
+  SignupRoute: typeof SignupRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
   TestimonialsRoute: typeof TestimonialsRoute
@@ -274,6 +344,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/refund': {
       id: '/refund'
       path: '/refund'
@@ -293,6 +370,13 @@ declare module '@tanstack/react-router' {
       path: '/offers'
       fullPath: '/offers'
       preLoaderRoute: typeof OffersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/gallery': {
@@ -328,6 +412,13 @@ declare module '@tanstack/react-router' {
       path: '/about'
       fullPath: '/about'
       preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -372,19 +463,59 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BookingFailedRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/saved': {
+      id: '/_authenticated/saved'
+      path: '/saved'
+      fullPath: '/saved'
+      preLoaderRoute: typeof AuthenticatedSavedRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/bookings': {
+      id: '/_authenticated/bookings'
+      path: '/bookings'
+      fullPath: '/bookings'
+      preLoaderRoute: typeof AuthenticatedBookingsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/account': {
+      id: '/_authenticated/account'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AuthenticatedAccountRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
+interface AuthenticatedRouteChildren {
+  AuthenticatedAccountRoute: typeof AuthenticatedAccountRoute
+  AuthenticatedBookingsRoute: typeof AuthenticatedBookingsRoute
+  AuthenticatedSavedRoute: typeof AuthenticatedSavedRoute
+}
+
+const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedAccountRoute: AuthenticatedAccountRoute,
+  AuthenticatedBookingsRoute: AuthenticatedBookingsRoute,
+  AuthenticatedSavedRoute: AuthenticatedSavedRoute,
+}
+
+const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
+  AuthenticatedRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AboutRoute: AboutRoute,
   BlogsRoute: BlogsRoute,
   ContactRoute: ContactRoute,
   FaqRoute: FaqRoute,
   GalleryRoute: GalleryRoute,
+  LoginRoute: LoginRoute,
   OffersRoute: OffersRoute,
   PrivacyRoute: PrivacyRoute,
   RefundRoute: RefundRoute,
+  SignupRoute: SignupRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
   TestimonialsRoute: TestimonialsRoute,
@@ -397,13 +528,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

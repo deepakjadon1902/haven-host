@@ -1,8 +1,9 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Menu, X, Search } from "lucide-react";
+import { Menu, X, Search, User } from "lucide-react";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/useAuth";
 
 const nav = [
   { to: "/", label: "Home" },
@@ -16,6 +17,7 @@ export function Navbar() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const { user } = useAuth();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -72,6 +74,15 @@ export function Navbar() {
           >
             <Search className="h-4 w-4" />
           </button>
+          {user ? (
+            <Button asChild variant="outline" className="rounded-full px-5 font-semibold border-white/15 hover:border-gold">
+              <Link to="/account"><User className="h-4 w-4" /> Account</Link>
+            </Button>
+          ) : (
+            <Button asChild variant="outline" className="rounded-full px-5 font-semibold border-white/15 hover:border-gold">
+              <Link to="/login">Sign in</Link>
+            </Button>
+          )}
           <Button asChild className="rounded-full px-5 font-semibold">
             <Link to="/hotels">Book a stay</Link>
           </Button>
@@ -104,6 +115,12 @@ export function Navbar() {
                   {item.label}
                 </Link>
               ))}
+              <Link
+                to={user ? "/account" : "/login"}
+                className="px-4 py-3 rounded-xl text-sm font-medium hover:bg-white/5"
+              >
+                {user ? "My account" : "Sign in"}
+              </Link>
               <Button asChild className="mt-2 rounded-full font-semibold">
                 <Link to="/hotels">Book a stay</Link>
               </Button>
