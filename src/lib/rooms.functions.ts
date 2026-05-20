@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { supabaseServer } from "@/integrations/supabase/client.server";
 import type { HotelSettings, Room, RoomAvailabilityMap } from "@/types/room";
 
 type DBRoom = {
@@ -46,7 +46,7 @@ function mapRoom(r: DBRoom): Room {
 }
 
 export const listPublicRooms = createServerFn({ method: "GET" }).handler(async () => {
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await supabaseServer
     .from("rooms")
     .select(
       "id, slug, name, description, price_per_night_cents, max_adults, max_children, pets_allowed, size, bed_type, amenities, images, cover_image, total_units, active, sort_order",
@@ -62,7 +62,7 @@ export const listPublicRooms = createServerFn({ method: "GET" }).handler(async (
 export const getPublicRoom = createServerFn({ method: "GET" })
   .inputValidator((input: unknown) => z.object({ slug: z.string().min(1).max(120) }).parse(input))
   .handler(async ({ data }) => {
-    const { data: row, error } = await supabaseAdmin
+    const { data: row, error } = await supabaseServer
       .from("rooms")
       .select(
         "id, slug, name, description, price_per_night_cents, max_adults, max_children, pets_allowed, size, bed_type, amenities, images, cover_image, total_units, active, sort_order",
@@ -75,8 +75,24 @@ export const getPublicRoom = createServerFn({ method: "GET" })
     return mapRoom(row as DBRoom);
   });
 
+export const getPublicRoomById = createServerFn({ method: "GET" })
+  .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
+  .handler(async ({ data }) => {
+    const { data: row, error } = await supabaseServer
+      .from("rooms")
+      .select(
+        "id, slug, name, description, price_per_night_cents, max_adults, max_children, pets_allowed, size, bed_type, amenities, images, cover_image, total_units, active, sort_order",
+      )
+      .eq("id", data.id)
+      .eq("active", true)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!row) return null;
+    return mapRoom(row as DBRoom);
+  });
+
 export const getHotelSettings = createServerFn({ method: "GET" }).handler(async () => {
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await supabaseServer
     .from("hotel_settings")
     .select("name, tagline, city, country, address, description, hero_image, contact_email, contact_phone")
     .eq("id", true)
@@ -117,14 +133,14 @@ export const getRoomAvailability = createServerFn({ method: "GET" })
     const to = addDays(data.from, data.days);
 
     const [{ data: room }, { data: inv }, { data: bks }] = await Promise.all([
-      supabaseAdmin.from("rooms").select("total_units").eq("id", data.roomId).maybeSingle(),
-      supabaseAdmin
+      supabaseServer.from("rooms").select("total_units").eq("id", data.roomId).maybeSingle(),
+      supabaseServer
         .from("room_inventory")
         .select("date, status")
         .eq("room_id", data.roomId)
         .gte("date", data.from)
         .lte("date", to),
-      supabaseAdmin
+      supabaseServer
         .from("bookings")
         .select("check_in, check_out, status")
         .eq("room_id", data.roomId)

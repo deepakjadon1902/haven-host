@@ -14,7 +14,7 @@ export function RoomCard({ room, index = 0 }: { room: Room; index?: number }) {
       <Link
         to="/rooms/$slug"
         params={{ slug: room.slug }}
-        className="group block rounded-3xl overflow-hidden border border-border bg-card hover:border-gold hover:shadow-elegant transition-all"
+        className="group block rounded-3xl overflow-hidden border border-border bg-card transition-all hover:border-gold"
       >
         <div className="relative aspect-[4/3] overflow-hidden bg-muted">
           {room.coverImage ? (
@@ -48,12 +48,13 @@ export function RoomCard({ room, index = 0 }: { room: Room; index?: number }) {
             <div>
               <p className="text-[11px] uppercase tracking-widest text-muted-foreground">From</p>
               <p className="text-2xl font-display font-semibold text-foreground">
-                ₹{room.pricePerNight.toLocaleString("en-IN")}
+                {"\u20B9"}
+                {room.pricePerNight.toLocaleString("en-IN")}
                 <span className="text-xs font-medium text-muted-foreground ml-1">/ night</span>
               </p>
             </div>
             <span className="text-sm font-semibold text-gold group-hover:translate-x-1 transition-transform">
-              View →
+              View {"\u2192"}
             </span>
           </div>
         </div>

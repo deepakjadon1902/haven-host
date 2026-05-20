@@ -1,11 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { supabaseServer } from "@/integrations/supabase/client.server";
 
 export const Route = createFileRoute("/sitemap.xml")({
   server: {
     handlers: {
       GET: async () => {
-        const { data } = await supabaseAdmin.from("rooms").select("slug").eq("active", true);
+        const { data } = await supabaseServer.from("rooms").select("slug").eq("active", true);
         const staticPaths = [
           "/", "/rooms", "/offers", "/about", "/contact", "/gallery",
           "/blogs", "/faq", "/testimonials", "/terms", "/privacy", "/refund",

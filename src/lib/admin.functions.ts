@@ -1,11 +1,54 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import type { Room } from "@/types/room";
 
 async function assertAdmin(supabase: NonNullable<unknown> & { rpc: (fn: string, params: unknown) => Promise<{ data: unknown; error: { message: string } | null }> }, userId: string) {
   const { data, error } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
   if (error) throw new Error(error.message);
   if (!data) throw new Error("Admin access required");
+}
+
+type DBRoom = {
+  id: string;
+  slug: string;
+  name: string;
+  description: string;
+  price_per_night_cents: number;
+  max_adults: number;
+  max_children: number;
+  pets_allowed: boolean;
+  size: string | null;
+  bed_type: string | null;
+  amenities: string[] | null;
+  images: string[] | null;
+  cover_image: string | null;
+  total_units: number;
+  active: boolean;
+  sort_order: number;
+};
+
+function mapRoom(r: DBRoom): Room {
+  const images = r.images ?? [];
+  return {
+    id: r.id,
+    slug: r.slug,
+    name: r.name,
+    description: r.description ?? "",
+    pricePerNightCents: Number(r.price_per_night_cents ?? 0),
+    pricePerNight: Math.round(Number(r.price_per_night_cents ?? 0) / 100),
+    maxAdults: r.max_adults,
+    maxChildren: r.max_children,
+    petsAllowed: r.pets_allowed,
+    size: r.size,
+    bedType: r.bed_type,
+    amenities: r.amenities ?? [],
+    images,
+    coverImage: r.cover_image ?? images[0] ?? "",
+    totalUnits: r.total_units,
+    active: r.active,
+    sortOrder: r.sort_order,
+  };
 }
 
 const roomSchema = z.object({
@@ -33,11 +76,13 @@ export const adminListRooms = createServerFn({ method: "GET" })
     await assertAdmin(supabase, userId);
     const { data, error } = await supabase
       .from("rooms")
-      .select("*")
+      .select(
+        "id, slug, name, description, price_per_night_cents, max_adults, max_children, pets_allowed, size, bed_type, amenities, images, cover_image, total_units, active, sort_order, created_at",
+      )
       .order("sort_order", { ascending: true })
       .order("created_at", { ascending: true });
     if (error) throw new Error(error.message);
-    return data ?? [];
+    return (data ?? []).map((r: DBRoom) => mapRoom(r));
   });
 
 export const adminCreateRoom = createServerFn({ method: "POST" })
@@ -48,7 +93,7 @@ export const adminCreateRoom = createServerFn({ method: "POST" })
     await assertAdmin(supabase, userId);
     const { data: row, error } = await supabase.from("rooms").insert(data).select("*").single();
     if (error) throw new Error(error.message);
-    return row;
+    return mapRoom(row as DBRoom);
   });
 
 export const adminUpdateRoom = createServerFn({ method: "POST" })
@@ -66,7 +111,7 @@ export const adminUpdateRoom = createServerFn({ method: "POST" })
       .select("*")
       .single();
     if (error) throw new Error(error.message);
-    return row;
+    return mapRoom(row as DBRoom);
   });
 
 export const adminDeleteRoom = createServerFn({ method: "POST" })

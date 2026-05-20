@@ -10,7 +10,8 @@ import {
 } from "lucide-react";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { Button } from "@/components/ui/button";
-import { findHotel, findRoomType } from "@/data/hotels";
+import type { RoomAvailabilityMap, Room } from "@/types/room";
+import { getPublicRoomById, getRoomAvailability } from "@/lib/rooms.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -62,19 +63,83 @@ function BookingPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  const hotel = useMemo(() => (search.hotel ? findHotel(search.hotel) : undefined), [search.hotel]);
-  const roomType = useMemo(
-    () => (search.hotel && search.room ? findRoomType(search.hotel, search.room) : undefined),
-    [search.hotel, search.room],
-  );
+  const roomId = search.room;
+  const [roomType, setRoomType] = useState<Room | null>(null);
+  const [roomLoading, setRoomLoading] = useState(true);
 
   const [step, setStep] = useState(0);
   const [adultsCount, setAdultsCount] = useState(2);
   const [childrenCount, setChildrenCount] = useState(0);
   const [nights, setNights] = useState(2);
+  const [checkIn, setCheckIn] = useState<string>(search.date ?? new Date().toISOString().slice(0, 10));
+  const [availability, setAvailability] = useState<RoomAvailabilityMap | null>(null);
+  const [availabilityLoading, setAvailabilityLoading] = useState(false);
 
   const maxAdults = roomType?.maxAdults ?? 2;
   const maxChildren = roomType?.maxChildren ?? 0;
+
+  useEffect(() => {
+    setCheckIn(search.date ?? new Date().toISOString().slice(0, 10));
+  }, [search.date]);
+
+  useEffect(() => {
+    const loadRoom = async () => {
+      if (!roomId) {
+        setRoomType(null);
+        setRoomLoading(false);
+        return;
+      }
+      setRoomLoading(true);
+      try {
+        const room = await getPublicRoomById({ id: roomId });
+        setRoomType(room);
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : "Failed to load room");
+        setRoomType(null);
+      } finally {
+        setRoomLoading(false);
+      }
+    };
+    loadRoom();
+  }, [roomId]);
+
+  useEffect(() => {
+    const loadAvailability = async () => {
+      if (!roomType) return;
+      setAvailabilityLoading(true);
+      try {
+        const days = Math.min(120, Math.max(45, nights + 30));
+        const map = await getRoomAvailability({ roomId: roomType.id, from: checkIn, days });
+        setAvailability(map);
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : "Failed to load availability");
+        setAvailability(null);
+      } finally {
+        setAvailabilityLoading(false);
+      }
+    };
+    loadAvailability();
+  }, [roomType?.id, checkIn, nights]);
+
+  const checkOut = useMemo(() => {
+    const d = new Date(checkIn + "T00:00:00Z");
+    d.setUTCDate(d.getUTCDate() + nights);
+    return d.toISOString().slice(0, 10);
+  }, [checkIn, nights]);
+
+  const isDateRangeAvailable = useMemo(() => {
+    if (!availability) return null;
+    let cur = checkIn;
+    while (cur < checkOut) {
+      const blocked = availability.blocked[cur];
+      const avail = availability.available[cur] ?? 0;
+      if (blocked || avail <= 0) return false;
+      const d = new Date(cur + "T00:00:00Z");
+      d.setUTCDate(d.getUTCDate() + 1);
+      cur = d.toISOString().slice(0, 10);
+    }
+    return true;
+  }, [availability, checkIn, checkOut]);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -138,11 +203,11 @@ function BookingPage() {
       navigate({ to: "/login", search: { redirect: "/booking" } as never });
       return;
     }
-    if (!hotel || !roomType) return;
-    const checkIn = search.date ?? new Date().toISOString().slice(0, 10);
-    const checkOut = new Date(new Date(checkIn).getTime() + nights * 86400000)
-      .toISOString()
-      .slice(0, 10);
+    if (!roomType) return;
+    if (isDateRangeAvailable === false) {
+      toast.error("Selected dates are not available. Please choose different dates.");
+      return;
+    }
     const subtotalCents = roomType.pricePerNight * nights * 100;
     const taxesCents = Math.round(subtotalCents * 0.12);
     const totalCents = subtotalCents + taxesCents;
@@ -151,10 +216,11 @@ function BookingPage() {
       .from("bookings")
       .insert({
         user_id: user.id,
-        hotel_slug: hotel.slug,
-        hotel_name: hotel.name,
+        hotel_slug: "maison-noir",
+        hotel_name: "Maison Noir",
         room_type_id: roomType.id,
         room_type_name: roomType.name,
+        room_id: roomType.id,
         check_in: checkIn,
         check_out: checkOut,
         nights,
@@ -181,18 +247,29 @@ function BookingPage() {
     toast.success("Reservation confirmed.");
     navigate({
       to: "/booking/success",
-      search: { ref: inserted.reference, hotel: hotel.slug, room: roomType.id } as never,
+      search: { ref: inserted.reference, hotel: "maison-noir", room: roomType.id } as never,
     });
   };
 
-  if (!hotel || !roomType) {
+  if (roomLoading) {
     return (
       <SiteLayout>
         <div className="mx-auto max-w-3xl px-5 py-32 text-center">
-          <h1 className="font-display text-4xl">Pick a room first</h1>
-          <p className="mt-3 text-white/65">Open a hotel and choose a room type to start booking.</p>
+          <h1 className="font-display text-4xl text-black">Loading…</h1>
+          <p className="mt-3 text-gray-700">Fetching room details.</p>
+        </div>
+      </SiteLayout>
+    );
+  }
+
+  if (!roomType) {
+    return (
+      <SiteLayout>
+        <div className="mx-auto max-w-3xl px-5 py-32 text-center">
+          <h1 className="font-display text-4xl text-black">Pick a room first</h1>
+          <p className="mt-3 text-gray-700">Open a room and choose dates to start booking.</p>
           <Button asChild className="mt-6 rounded-full font-semibold">
-            <Link to="/hotels">Browse hotels</Link>
+            <Link to="/rooms">Browse rooms</Link>
           </Button>
         </div>
       </SiteLayout>
@@ -207,15 +284,20 @@ function BookingPage() {
     <SiteLayout>
       <div className="mx-auto max-w-7xl px-5 lg:px-8 py-10 lg:py-14">
         <Link
-          to="/hotels/$hotelId"
-          params={{ hotelId: hotel.slug }}
-          className="inline-flex items-center gap-2 text-sm text-white/70 hover:text-gold"
+          to="/rooms/$slug"
+          params={{ slug: roomType?.slug ?? "" }}
+          className="inline-flex items-center gap-2 text-sm text-gray-700 hover:text-black"
         >
-          <ArrowLeft className="h-4 w-4" /> Back to {hotel.name}
+          <ArrowLeft className="h-4 w-4" /> Back to {roomType?.name}
         </Link>
 
         <div className="mt-6 grid lg:grid-cols-[1.5fr_1fr] gap-10">
           <div>
+            {isDateRangeAvailable === false ? (
+              <div className="mb-4 rounded-2xl border border-red-600/30 bg-red-50 p-4 text-sm text-red-900">
+                Selected dates are not available. Pick a different check-in date or reduce nights.
+              </div>
+            ) : null}
             <Stepper step={step} />
 
             <form onSubmit={form.handleSubmit(onSubmit)} className="mt-8">
@@ -245,7 +327,7 @@ function BookingPage() {
                     <Section title="Travel details">
                       <Grid>
                         <Field label="Transport" icon={<Car />}>
-                          <select className={inputCls + " [color-scheme:dark]"} {...form.register("transport")}>
+                          <select className={inputCls} {...form.register("transport")}>
                             <option value="personal">Personal vehicle</option>
                             <option value="public">Public transport</option>
                             <option value="shuttle">Hotel shuttle</option>
@@ -256,8 +338,16 @@ function BookingPage() {
                         </Field>
                       </Grid>
                       <Grid>
+                        <Field label="Check-in date" icon={<Calendar />}>
+                          <input
+                            type="date"
+                            value={checkIn}
+                            onChange={(e) => setCheckIn(e.target.value)}
+                            className={inputCls}
+                          />
+                        </Field>
                         <Field label="Arrival time" icon={<Clock />} error={form.formState.errors.arrivalTime?.message}>
-                          <input type="time" className={inputCls + " [color-scheme:dark]"} {...form.register("arrivalTime")} />
+                          <input type="time" className={inputCls} {...form.register("arrivalTime")} />
                         </Field>
                         <Field label="Nights" icon={<Calendar />}>
                           <Counter value={nights} setValue={setNights} min={1} max={30} />
@@ -331,7 +421,7 @@ function BookingPage() {
                           <span
                             key={p}
                             className={`px-4 h-10 rounded-full border text-sm font-semibold inline-flex items-center ${
-                              i === 0 ? "bg-gold text-black border-gold" : "border-white/15 text-white/70"
+                              i === 0 ? "bg-gold text-black border-gold" : "border-black/15 text-black/70"
                             }`}
                           >
                             {p}
@@ -352,7 +442,7 @@ function BookingPage() {
                           <input className={inputCls} placeholder="123" {...form.register("cardCvc")} />
                         </Field>
                       </Grid>
-                      <p className="text-xs text-white/50">
+                      <p className="text-xs text-gray-700">
                         This is a demo. No real charges are made.
                       </p>
                     </Section>
@@ -366,7 +456,7 @@ function BookingPage() {
                   variant="outline"
                   onClick={() => setStep((s) => Math.max(0, s - 1))}
                   disabled={step === 0}
-                  className="rounded-full border-white/15"
+                  className="rounded-full border-black/15 text-black hover:bg-gray-50"
                 >
                   <ArrowLeft className="h-4 w-4" /> Back
                 </Button>
@@ -380,7 +470,8 @@ function BookingPage() {
                     disabled={form.formState.isSubmitting}
                     className="rounded-full font-semibold px-7 h-11"
                   >
-                    Confirm & pay ₹{total.toLocaleString("en-IN")}
+                    Confirm & pay {"\u20B9"}
+                    {total.toLocaleString("en-IN")}
                   </Button>
                 )}
               </div>
@@ -388,28 +479,25 @@ function BookingPage() {
           </div>
 
           <aside className="lg:sticky lg:top-28 self-start">
-            <div className="rounded-3xl border border-white/10 overflow-hidden">
-              <img src={hotel.heroImage} alt="" className="aspect-[4/3] w-full object-cover" />
+            <div className="rounded-3xl border border-black/10 overflow-hidden bg-white">
+              <img src={roomType.coverImage} alt="" className="aspect-[4/3] w-full object-cover" />
               <div className="p-6">
-                <p className="text-xs uppercase tracking-widest text-gold font-semibold">{hotel.city}</p>
-                <h3 className="mt-1 font-display text-xl font-semibold">{hotel.name}</h3>
-                <p className="mt-1 text-sm text-white/65">{roomType.name}</p>
-                <div className="mt-4 text-sm text-white/70 space-y-1">
-                  {search.date && (
-                    <p><span className="text-white/50">Check-in</span> · {search.date}</p>
-                  )}
-                  <p><span className="text-white/50">Nights</span> · {nights}</p>
-                  <p><span className="text-white/50">Guests</span> · {adultsCount} adults{childrenCount ? `, ${childrenCount} children` : ""}</p>
+                <p className="text-xs uppercase tracking-widest text-gold font-semibold">Maison Noir</p>
+                <h3 className="mt-1 font-display text-xl font-semibold text-black">Reservation summary</h3>
+                <p className="mt-1 text-sm text-gray-700">{roomType.name}</p>
+                <div className="mt-4 text-sm text-gray-700 space-y-1">
+                  <p><span className="text-gray-700/70">Check-in</span> · {checkIn}</p>
+                  <p><span className="text-gray-700/70">Check-out</span> · {checkOut}</p>
+                  <p><span className="text-gray-700/70">Nights</span> · {nights}</p>
+                  <p><span className="text-gray-700/70">Guests</span> · {adultsCount} adults{childrenCount ? `, ${childrenCount} children` : ""}</p>
                 </div>
-                <div className="mt-5 border-t border-white/10 pt-5 space-y-2 text-sm">
+                <div className="mt-5 border-t border-black/10 pt-5 space-y-2 text-sm text-black">
                   <Row label={`₹${roomType.pricePerNight.toLocaleString("en-IN")} × ${nights} nights`} value={`₹${subtotal.toLocaleString("en-IN")}`} />
                   <Row label="Taxes & fees" value={`₹${taxes.toLocaleString("en-IN")}`} />
                 </div>
-                <div className="mt-4 border-t border-white/10 pt-4 flex items-baseline justify-between">
+                <div className="mt-4 border-t border-black/10 pt-4 flex items-baseline justify-between text-black">
                   <span className="font-semibold">Total</span>
-                  <span className="font-display text-2xl gold-text font-semibold">
-                    ₹{total.toLocaleString("en-IN")}
-                  </span>
+                  <span className="font-display text-2xl gold-text font-semibold">₹{total.toLocaleString("en-IN")}</span>
                 </div>
               </div>
             </div>
@@ -421,7 +509,7 @@ function BookingPage() {
 }
 
 const inputCls =
-  "w-full bg-white/[0.04] border border-white/10 rounded-xl px-4 h-11 text-sm font-medium outline-none focus:border-gold/60 focus:bg-white/[0.06] transition placeholder:text-white/35";
+  "w-full bg-white border border-black/15 rounded-xl px-4 h-11 text-sm font-medium text-black outline-none focus:border-gold/60 transition placeholder:text-gray-500";
 
 function Stepper({ step }: { step: number }) {
   return (
@@ -434,13 +522,13 @@ function Stepper({ step }: { step: number }) {
                 ? "bg-gold border-gold text-black"
                 : i === step
                   ? "border-gold text-gold"
-                  : "border-white/15 text-white/40"
+                  : "border-black/15 text-black/40"
             }`}
           >
             {i < step ? <Check className="h-4 w-4" /> : i + 1}
           </div>
-          <span className={`text-sm font-medium ${i <= step ? "text-white" : "text-white/45"}`}>{s}</span>
-          {i < steps.length - 1 && <div className={`h-px flex-1 ${i < step ? "bg-gold" : "bg-white/10"}`} />}
+          <span className={`text-sm font-medium ${i <= step ? "text-black" : "text-black/50"}`}>{s}</span>
+          {i < steps.length - 1 && <div className={`h-px flex-1 ${i < step ? "bg-gold" : "bg-black/10"}`} />}
         </div>
       ))}
     </div>
@@ -449,8 +537,8 @@ function Stepper({ step }: { step: number }) {
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="rounded-3xl border border-white/10 p-6 md:p-7 bg-card/40">
-      <h3 className="font-display text-lg font-semibold">{title}</h3>
+    <div className="rounded-3xl border border-black/10 bg-white p-6 md:p-7">
+      <h3 className="font-display text-lg font-semibold text-black">{title}</h3>
       <div className="mt-5 space-y-4">{children}</div>
     </div>
   );
@@ -473,7 +561,7 @@ function Field({
 }) {
   return (
     <label className="block">
-      <span className="text-xs uppercase tracking-widest text-white/55 font-semibold flex items-center gap-2">
+      <span className="text-xs uppercase tracking-widest text-gray-700 font-semibold flex items-center gap-2">
         {icon && <span className="text-gold [&_svg]:h-3.5 [&_svg]:w-3.5">{icon}</span>}
         {label}
       </span>
@@ -495,21 +583,21 @@ function Counter({
   max: number;
 }) {
   return (
-    <div className="flex items-center justify-between h-11 px-2 rounded-xl border border-white/10 bg-white/[0.04]">
+    <div className="flex items-center justify-between h-11 px-2 rounded-xl border border-black/15 bg-white">
       <button
         type="button"
         onClick={() => setValue(Math.max(min, value - 1))}
         disabled={value <= min}
-        className="h-8 w-8 grid place-items-center rounded-lg hover:bg-white/10 disabled:opacity-30"
+        className="h-8 w-8 grid place-items-center rounded-lg hover:bg-gray-50 disabled:opacity-30"
       >
         <Minus className="h-4 w-4" />
       </button>
-      <span className="font-semibold">{value}</span>
+      <span className="font-semibold text-black">{value}</span>
       <button
         type="button"
         onClick={() => setValue(Math.min(max, value + 1))}
         disabled={value >= max}
-        className="h-8 w-8 grid place-items-center rounded-lg hover:bg-white/10 disabled:opacity-30"
+        className="h-8 w-8 grid place-items-center rounded-lg hover:bg-gray-50 disabled:opacity-30"
       >
         <Plus className="h-4 w-4" />
       </button>
@@ -532,7 +620,7 @@ function GuestRow({
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="rounded-2xl border border-white/10 p-4 bg-white/[0.02]"
+      className="rounded-2xl border border-black/10 bg-white p-4"
     >
       <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-3">
         {label} {idx + 1}
@@ -570,9 +658,9 @@ function GuestRow({
 
 function Row({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex justify-between text-white/70">
+    <div className="flex justify-between text-gray-700">
       <span>{label}</span>
-      <span className="text-white">{value}</span>
+      <span className="text-black">{value}</span>
     </div>
   );
 }

@@ -7,7 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 
 const nav = [
   { to: "/", label: "Home" },
-  { to: "/hotels", label: "Hotels" },
+  { to: "/rooms", label: "Rooms" },
   { to: "/offers", label: "Offers" },
   { to: "/about", label: "About" },
   { to: "/contact", label: "Contact" },
@@ -31,7 +31,9 @@ export function Navbar() {
   return (
     <header
       className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${
-        scrolled ? "glass-strong shadow-elegant" : "bg-transparent"
+        scrolled
+          ? "glass-strong border-b border-black/10"
+          : "bg-white/85 backdrop-blur border-b border-black/10"
       }`}
     >
       <div className="mx-auto max-w-7xl px-5 lg:px-8 h-16 lg:h-20 flex items-center justify-between">
@@ -52,7 +54,7 @@ export function Navbar() {
                 key={item.to}
                 to={item.to}
                 className={`relative px-4 py-2 text-sm font-medium transition-colors ${
-                  active ? "text-gold" : "text-white/80 hover:text-white"
+                  active ? "text-gold" : "text-black/70 hover:text-black"
                 }`}
               >
                 {item.label}
@@ -70,21 +72,21 @@ export function Navbar() {
         <div className="hidden lg:flex items-center gap-3">
           <button
             aria-label="Search"
-            className="h-10 w-10 grid place-items-center rounded-full border border-white/10 hover:border-gold hover:text-gold transition"
+            className="h-10 w-10 grid place-items-center rounded-full border border-black/15 hover:border-gold hover:text-gold transition"
           >
             <Search className="h-4 w-4" />
           </button>
           {user ? (
-            <Button asChild variant="outline" className="rounded-full px-5 font-semibold border-white/15 hover:border-gold">
+            <Button asChild variant="outline" className="rounded-full px-5 font-semibold border-black/15 hover:border-gold text-black hover:text-gold">
               <Link to="/account"><User className="h-4 w-4" /> Account</Link>
             </Button>
           ) : (
-            <Button asChild variant="outline" className="rounded-full px-5 font-semibold border-white/15 hover:border-gold">
+            <Button asChild variant="outline" className="rounded-full px-5 font-semibold border-black/15 hover:border-gold text-black hover:text-gold">
               <Link to="/login">Sign in</Link>
             </Button>
           )}
           <Button asChild className="rounded-full px-5 font-semibold">
-            <Link to="/hotels">Book a stay</Link>
+            <Link to="/rooms">Book a stay</Link>
           </Button>
         </div>
 
@@ -122,7 +124,7 @@ export function Navbar() {
                 {user ? "My account" : "Sign in"}
               </Link>
               <Button asChild className="mt-2 rounded-full font-semibold">
-                <Link to="/hotels">Book a stay</Link>
+                <Link to="/rooms">Book a stay</Link>
               </Button>
             </div>
           </motion.div>

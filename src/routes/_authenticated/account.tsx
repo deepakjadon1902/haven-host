@@ -1,10 +1,10 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
-import { Loader2, Save } from "lucide-react";
+import { Loader2, Save, Shield } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -26,6 +26,7 @@ function AccountPage() {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: { full_name: "", phone: "", avatar_url: "" },
@@ -34,6 +35,13 @@ function AccountPage() {
   useEffect(() => {
     if (!user) return;
     (async () => {
+      // Check if user is admin
+      const { data: adminData } = await supabase.rpc("has_role", {
+        _user_id: user.id,
+        _role: "admin",
+      });
+      setIsAdmin(!!adminData);
+
       const { data } = await supabase
         .from("profiles")
         .select("full_name, phone, avatar_url")
@@ -72,6 +80,20 @@ function AccountPage() {
       <p className="mt-2 text-white/65 max-w-xl">
         Keep your details current — we'll use them to personalize check-in and pre-arrival concierge.
       </p>
+
+      {/* Admin Access Button */}
+      {isAdmin && (
+        <div className="mt-6 flex items-center gap-3 p-4 rounded-xl bg-yellow-500/20 border border-yellow-500/40">
+          <Shield className="h-5 w-5 text-yellow-600" />
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-yellow-700">You have admin access</p>
+            <p className="text-xs text-yellow-600">Manage rooms, bookings, and inventory</p>
+          </div>
+          <Button asChild className="bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg">
+            <Link to="/admin">Go to Admin Panel</Link>
+          </Button>
+        </div>
+      )}
 
       {loading ? (
         <div className="mt-10 flex items-center gap-2 text-white/60">

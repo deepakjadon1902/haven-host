@@ -16,15 +16,14 @@ export function ComingSoon({
     <SiteLayout>
       <PageHeader eyebrow={eyebrow} title={title} description={description} />
       <div className="mx-auto max-w-3xl px-5 py-24 text-center">
-        <p className="text-white/65 leading-relaxed">
-          This section is on the way. Meanwhile, browse our hotels or get in touch — we reply within
-          the hour.
+        <p className="leading-relaxed text-gray-700">
+          This section is on the way. Meanwhile, browse our rooms or get in touch — we reply within the hour.
         </p>
-        <div className="mt-8 flex justify-center gap-3 flex-wrap">
+        <div className="mt-8 flex flex-wrap justify-center gap-3">
           <Button asChild className="rounded-full font-semibold">
-            <Link to="/hotels">Browse hotels</Link>
+            <Link to="/rooms">Browse rooms</Link>
           </Button>
-          <Button asChild variant="outline" className="rounded-full border-white/20">
+          <Button asChild variant="outline" className="rounded-full border-black/15 text-black hover:bg-gray-50">
             <Link to="/">Back home</Link>
           </Button>
         </div>
@@ -32,3 +31,4 @@ export function ComingSoon({
     </SiteLayout>
   );
 }
+

@@ -60,7 +60,7 @@ function BookingsPage() {
           <h3 className="mt-4 font-display text-xl font-semibold">No bookings yet</h3>
           <p className="mt-2 text-white/60">Reserve your first Maison Noir stay.</p>
           <Button asChild className="mt-6 rounded-full font-semibold">
-            <Link to="/hotels">Browse hotels <ArrowRight className="h-4 w-4" /></Link>
+            <Link to="/rooms">Browse rooms <ArrowRight className="h-4 w-4" /></Link>
           </Button>
         </div>
       ) : (

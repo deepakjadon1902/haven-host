@@ -39,8 +39,8 @@
   --color-surface: var(--surface);
   --color-surface-elevated: var(--surface-elevated);
 
-  --shadow-gold: 0 10px 40px -10px color-mix(in oklab, var(--gold) 35%, transparent);
-  --shadow-elegant: 0 20px 60px -20px oklch(0 0 0 / 0.6);
+  --shadow-gold: none;
+  --shadow-elegant: none;
 }
 
 :root {
@@ -159,6 +159,6 @@
       var(--background);
   }
 
-  .shadow-elegant { box-shadow: 0 20px 60px -25px color-mix(in oklab, black 25%, transparent); }
-  .shadow-gold { box-shadow: var(--shadow-gold); }
+  .shadow-elegant { box-shadow: none; }
+  .shadow-gold { box-shadow: none; }
 }

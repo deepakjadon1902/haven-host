@@ -10,7 +10,7 @@ export function PageHeader({
   description?: string;
 }) {
   return (
-    <section className="hero-radial border-b border-white/10">
+    <section className="hero-radial border-b border-black/10">
       <div className="mx-auto max-w-7xl px-5 lg:px-8 py-20 lg:py-28">
         {eyebrow && (
           <motion.p
@@ -34,7 +34,7 @@ export function PageHeader({
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="mt-5 text-base md:text-lg text-white/75 max-w-2xl leading-relaxed"
+            className="mt-5 text-base md:text-lg text-gray-700 max-w-2xl leading-relaxed"
           >
             {description}
           </motion.p>

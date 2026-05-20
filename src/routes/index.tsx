@@ -1,30 +1,50 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { motion } from "framer-motion";
-import { ArrowRight, Calendar, MapPin, Sparkles, Users } from "lucide-react";
-import { useState } from "react";
+import { ArrowRight, Calendar, Search, Sparkles, Users } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
 import { SiteLayout } from "@/components/site/SiteLayout";
-import { HotelCard } from "@/components/site/HotelCard";
+import { RoomCard } from "@/components/site/RoomCard";
 import { Button } from "@/components/ui/button";
-import { hotels } from "@/data/hotels";
+import type { Room } from "@/types/room";
+import { listPublicRooms } from "@/lib/rooms.functions";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Maison Noir — Curated luxury hotels with live inventory" },
-      { name: "description", content: "Book hand-picked design hotels with real-time room availability, transparent rates, and elegant booking." },
-      { property: "og:title", content: "Maison Noir — Curated luxury hotels" },
-      { property: "og:description", content: "Hand-picked design hotels with live inventory." },
+      { title: "Maison Noir — Royal rooms with live availability" },
+      {
+        name: "description",
+        content: "A single hotel with room showcase, live inventory, and a clean, royal booking experience.",
+      },
     ],
   }),
   component: HomePage,
 });
 
 function HomePage() {
+  const [rooms, setRooms] = useState<Room[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const data = await listPublicRooms();
+        setRooms(data.filter((r) => r.active));
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : "Failed to load rooms");
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
+  }, []);
+
   return (
     <SiteLayout>
       <Hero />
-      <Featured />
-      <Experience />
+      <Featured rooms={rooms} loading={loading} />
+      <Why />
       <Stats />
       <CTA />
     </SiteLayout>
@@ -33,83 +53,95 @@ function HomePage() {
 
 function Hero() {
   const navigate = useNavigate();
-  const [city, setCity] = useState("");
+  const [q, setQ] = useState("");
+  const [checkIn, setCheckIn] = useState<string>("");
+  const [guests, setGuests] = useState(2);
 
   return (
-    <section className="relative min-h-[92vh] flex items-center overflow-hidden -mt-16 lg:-mt-20 pt-16 lg:pt-20">
+    <section className="relative -mt-16 flex min-h-[92vh] items-center overflow-hidden pt-16 lg:-mt-20 lg:pt-20">
       <div className="absolute inset-0">
         <img
           src="https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=2400&q=80"
           alt=""
           className="h-full w-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-br from-black/85 via-black/65 to-black/85" />
-        <div className="absolute inset-0 hero-radial opacity-40" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/85 via-black/70 to-black/95" />
+        <div className="absolute inset-0 hero-radial opacity-35" />
       </div>
 
-      <div className="relative mx-auto max-w-7xl px-5 lg:px-8 w-full py-20">
+      <div className="relative mx-auto w-full max-w-7xl px-5 py-20 lg:px-8">
         <motion.p
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-xs uppercase tracking-[0.3em] text-gold font-semibold flex items-center gap-2"
+          className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.3em] text-gold"
         >
-          <Sparkles className="h-3.5 w-3.5" /> Curated · Live inventory · Zero noise
+          <Sparkles className="h-3.5 w-3.5" /> Single hotel · Live inventory · Royal stay
         </motion.p>
 
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="mt-6 font-display font-semibold text-5xl md:text-7xl lg:text-[5.5rem] leading-[0.95] max-w-5xl"
+          className="mt-6 max-w-5xl font-display text-5xl font-semibold leading-[0.95] text-white md:text-7xl lg:text-[5.5rem]"
         >
-          Stay somewhere<br />
-          <span className="gold-text italic font-serif">extraordinary.</span>
+          Maison Noir,{" "}
+          <span className="gold-text italic font-serif">crafted for calm.</span>
         </motion.h1>
 
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.18 }}
-          className="mt-6 text-lg md:text-xl text-white/80 max-w-2xl leading-relaxed"
+          className="mt-6 max-w-2xl text-lg leading-relaxed text-white/80 md:text-xl"
         >
-          A private collection of design-led hotels across India, Morocco, Japan and Italy —
-          bookable with real-time room availability and no hidden fees.
+          Rooms are managed by the owner in the admin panel — guests book only what’s truly available.
         </motion.p>
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.26 }}
-          className="mt-10 glass-strong rounded-2xl p-3 md:p-4 max-w-3xl shadow-elegant"
+          className="mt-10 max-w-3xl rounded-2xl border border-white/20 bg-white/10 p-3 backdrop-blur md:p-4"
         >
           <form
             onSubmit={(e) => {
               e.preventDefault();
-              navigate({ to: "/hotels", search: { city: city || undefined } as never });
+              const search: Record<string, string> = {};
+              if (q.trim()) search.q = q.trim();
+              navigate({ to: "/rooms", search: search as never });
             }}
-            className="grid grid-cols-1 md:grid-cols-[1.4fr_1fr_1fr_auto] gap-2"
+            className="grid grid-cols-1 gap-2 md:grid-cols-[1.4fr_1fr_1fr_auto]"
           >
-            <Field icon={<MapPin className="h-4 w-4" />} label="Destination">
+            <Field icon={<Search className="h-4 w-4" />} label="Search rooms">
               <input
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-                placeholder="Vrindavan, Kyoto…"
-                className="w-full bg-transparent outline-none text-sm font-medium placeholder:text-white/40"
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                placeholder="Suite, villa, garden..."
+                className="w-full bg-transparent text-sm font-medium text-white outline-none placeholder:text-white/40"
               />
             </Field>
             <Field icon={<Calendar className="h-4 w-4" />} label="Check-in">
-              <input type="date" className="w-full bg-transparent outline-none text-sm font-medium [color-scheme:dark]" />
+              <input
+                type="date"
+                value={checkIn}
+                onChange={(e) => setCheckIn(e.target.value)}
+                className="w-full bg-transparent text-sm font-medium text-white outline-none [color-scheme:dark]"
+              />
             </Field>
             <Field icon={<Users className="h-4 w-4" />} label="Guests">
-              <select className="w-full bg-transparent outline-none text-sm font-medium [color-scheme:dark]">
-                <option>2 adults</option>
-                <option>1 adult</option>
-                <option>2 adults, 1 child</option>
-                <option>3 adults</option>
+              <select
+                value={String(guests)}
+                onChange={(e) => setGuests(Number(e.target.value))}
+                className="w-full bg-transparent text-sm font-medium text-white outline-none [color-scheme:dark]"
+              >
+                <option value="1">1 guest</option>
+                <option value="2">2 guests</option>
+                <option value="3">3 guests</option>
+                <option value="4">4 guests</option>
               </select>
             </Field>
-            <Button type="submit" size="lg" className="rounded-xl font-semibold h-full md:px-6">
-              Search <ArrowRight className="h-4 w-4" />
+            <Button type="submit" size="lg" className="h-full rounded-xl font-semibold md:px-6">
+              Browse <ArrowRight className="h-4 w-4" />
             </Button>
           </form>
         </motion.div>
@@ -118,71 +150,69 @@ function Hero() {
   );
 }
 
-function Field({
-  icon,
-  label,
-  children,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  children: React.ReactNode;
-}) {
+function Field({ icon, label, children }: { icon: React.ReactNode; label: string; children: React.ReactNode }) {
   return (
-    <label className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/[0.04] border border-white/10 hover:border-gold/40 transition">
+    <label className="flex items-center gap-3 rounded-xl border border-white/15 bg-black/15 px-4 py-3">
       <span className="text-gold">{icon}</span>
-      <span className="flex-1 min-w-0">
-        <span className="block text-[10px] uppercase tracking-widest text-white/50 font-semibold">
-          {label}
-        </span>
+      <span className="min-w-0 flex-1">
+        <span className="block text-[10px] font-semibold uppercase tracking-widest text-white/55">{label}</span>
         {children}
       </span>
     </label>
   );
 }
 
-function Featured() {
+function Featured({ rooms, loading }: { rooms: Room[]; loading: boolean }) {
+  const featured = useMemo(() => rooms.slice().sort((a, b) => a.sortOrder - b.sortOrder).slice(0, 3), [rooms]);
+
   return (
-    <section className="mx-auto max-w-7xl px-5 lg:px-8 py-24">
-      <div className="flex items-end justify-between flex-wrap gap-4 mb-12">
+    <section className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
+      <div className="mb-10 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-xs uppercase tracking-[0.25em] text-gold font-semibold">
-            The collection
-          </p>
-          <h2 className="mt-3 text-4xl md:text-5xl font-display font-semibold max-w-xl leading-tight">
-            Hotels you'd <span className="gold-text italic">return to.</span>
+          <p className="text-xs font-semibold uppercase tracking-[0.25em] text-gold">Rooms</p>
+          <h2 className="mt-3 max-w-xl font-display text-4xl font-semibold leading-tight text-black md:text-5xl">
+            Designed for a{" "}
+            <span className="gold-text italic">royal rest.</span>
           </h2>
         </div>
-        <Button asChild variant="outline" className="rounded-full border-white/20 hover:border-gold hover:bg-transparent hover:text-gold">
-          <Link to="/hotels">View all <ArrowRight className="h-4 w-4" /></Link>
+        <Button asChild variant="outline" className="rounded-full border-black/15 text-black hover:border-gold hover:text-gold">
+          <Link to="/rooms">
+            View all <ArrowRight className="h-4 w-4" />
+          </Link>
         </Button>
       </div>
 
-      <div className="grid gap-6 md:gap-8 sm:grid-cols-2 lg:grid-cols-3">
-        {hotels.slice(0, 3).map((h, i) => (
-          <HotelCard key={h.id} hotel={h} index={i} />
-        ))}
-      </div>
+      {loading ? (
+        <div className="py-14 text-center text-gray-700">Loading rooms...</div>
+      ) : (
+        <div className="grid gap-6 sm:grid-cols-2 md:gap-8 lg:grid-cols-3">
+          {featured.map((room, i) => (
+            <RoomCard key={room.id} room={room} index={i} />
+          ))}
+        </div>
+      )}
     </section>
   );
 }
 
-function Experience() {
+function Why() {
   const items = [
-    { title: "Live inventory", body: "Every room number is tracked individually. What you see is genuinely available — never overbooked." },
-    { title: "Transparent pricing", body: "No bait rates. Taxes, fees and offers are calculated upfront, in your currency." },
-    { title: "Concierge-grade support", body: "A real human, reachable in under 60 seconds — before, during, and after your stay." },
+    { title: "Owner-controlled inventory", body: "Rooms, units, and maintenance blocks are managed in the admin panel." },
+    { title: "Calendar-aligned booking", body: "Bookings reduce availability per day. Full days become read-only booked." },
+    { title: "Transparent totals", body: "Clear pricing with taxes shown before confirmation." },
   ];
+
   return (
-    <section className="border-y border-white/10 bg-[color-mix(in_oklab,var(--surface)_50%,black)]">
-      <div className="mx-auto max-w-7xl px-5 lg:px-8 py-24 grid lg:grid-cols-[1fr_1.4fr] gap-16 items-start">
+    <section className="border-t border-black/10 bg-white">
+      <div className="mx-auto grid max-w-7xl gap-10 px-5 py-20 lg:grid-cols-[1fr_1.4fr] lg:gap-16 lg:px-8">
         <div>
-          <p className="text-xs uppercase tracking-[0.25em] text-gold font-semibold">Why MaisonNoir</p>
-          <h2 className="mt-3 text-4xl md:text-5xl font-display font-semibold leading-tight">
-            A booking experience that <span className="gold-text italic">respects you.</span>
+          <p className="text-xs font-semibold uppercase tracking-[0.25em] text-gold">Why Maison Noir</p>
+          <h2 className="mt-3 font-display text-4xl font-semibold leading-tight text-black md:text-5xl">
+            Calm, clean,{" "}
+            <span className="gold-text italic">royal</span>.
           </h2>
-          <p className="mt-5 text-white/70 leading-relaxed max-w-md">
-            Built from the ground up to feel like the kind of hotel you actually want to stay in —
-            quiet, considered, and immaculately run.
+          <p className="mt-5 max-w-md text-sm leading-relaxed text-gray-700">
+            A single-property system: the hotel owner controls rooms, availability, and bookings — guests get a smooth experience.
           </p>
         </div>
         <div className="grid gap-4">
@@ -193,13 +223,13 @@ function Experience() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.07 }}
-              className="rounded-2xl border border-white/10 p-7 hover:border-gold/60 hover:bg-white/[0.02] transition-all"
+              className="rounded-2xl border border-black/10 bg-white p-7"
             >
               <div className="flex items-baseline gap-4">
-                <span className="font-display text-2xl gold-text">0{i + 1}</span>
+                <span className="gold-text font-display text-2xl">0{i + 1}</span>
                 <div>
-                  <h3 className="font-display text-xl font-semibold">{it.title}</h3>
-                  <p className="mt-2 text-white/70 text-sm leading-relaxed">{it.body}</p>
+                  <h3 className="font-display text-xl font-semibold text-black">{it.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-gray-700">{it.body}</p>
                 </div>
               </div>
             </motion.div>
@@ -212,17 +242,17 @@ function Experience() {
 
 function Stats() {
   const stats = [
-    { v: "42", l: "Hotels" },
-    { v: "18", l: "Countries" },
-    { v: "120K+", l: "Nights booked" },
-    { v: "4.9", l: "Guest rating" },
+    { v: "1", l: "Hotel" },
+    { v: "Live", l: "Inventory" },
+    { v: "0", l: "Overbooks" },
+    { v: "Royal", l: "Experience" },
   ];
   return (
-    <section className="mx-auto max-w-7xl px-5 lg:px-8 py-20 grid grid-cols-2 md:grid-cols-4 gap-6">
+    <section className="mx-auto grid max-w-7xl grid-cols-2 gap-6 px-5 py-16 md:grid-cols-4 lg:px-8">
       {stats.map((s) => (
-        <div key={s.l} className="rounded-2xl border border-white/10 p-8 text-center">
-          <p className="font-display text-4xl md:text-5xl font-semibold gold-text">{s.v}</p>
-          <p className="mt-2 text-xs uppercase tracking-widest text-white/60">{s.l}</p>
+        <div key={s.l} className="rounded-2xl border border-black/10 bg-white p-8 text-center">
+          <p className="gold-text font-display text-4xl font-semibold md:text-5xl">{s.v}</p>
+          <p className="mt-2 text-xs font-semibold uppercase tracking-widest text-gray-700">{s.l}</p>
         </div>
       ))}
     </section>
@@ -231,17 +261,19 @@ function Stats() {
 
 function CTA() {
   return (
-    <section className="mx-auto max-w-7xl px-5 lg:px-8 py-24">
-      <div className="relative overflow-hidden rounded-3xl border border-gold/30 p-10 md:p-16 hero-radial">
+    <section className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
+      <div className="relative overflow-hidden rounded-3xl border border-gold/30 bg-white p-10 md:p-16">
         <div className="max-w-2xl">
-          <h2 className="text-4xl md:text-5xl font-display font-semibold leading-tight">
-            Reserve your next chapter.
+          <h2 className="font-display text-4xl font-semibold leading-tight text-black md:text-5xl">
+            Ready to book?
           </h2>
-          <p className="mt-4 text-white/75 text-lg">
-            From the riverside ghats of Vrindavan to a moonlit riad in Marrakech.
+          <p className="mt-4 text-sm leading-relaxed text-gray-700">
+            Browse rooms, pick dates, and confirm only what’s available.
           </p>
-          <Button asChild size="lg" className="mt-8 rounded-full font-semibold h-12 px-7">
-            <Link to="/hotels">Browse hotels <ArrowRight className="h-4 w-4" /></Link>
+          <Button asChild size="lg" className="mt-8 h-12 rounded-full px-7 font-semibold">
+            <Link to="/rooms">
+              Browse rooms <ArrowRight className="h-4 w-4" />
+            </Link>
           </Button>
         </div>
       </div>
