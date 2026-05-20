@@ -24,9 +24,7 @@ import { Route as BlogsRouteImport } from './routes/blogs'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as HotelsIndexRouteImport } from './routes/hotels/index'
 import { Route as BookingIndexRouteImport } from './routes/booking/index'
-import { Route as HotelsHotelIdRouteImport } from './routes/hotels/$hotelId'
 import { Route as BookingSuccessRouteImport } from './routes/booking/success'
 import { Route as BookingFailedRouteImport } from './routes/booking/failed'
 import { Route as AuthenticatedSavedRouteImport } from './routes/_authenticated/saved'
@@ -107,19 +105,9 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const HotelsIndexRoute = HotelsIndexRouteImport.update({
-  id: '/hotels/',
-  path: '/hotels/',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const BookingIndexRoute = BookingIndexRouteImport.update({
   id: '/booking/',
   path: '/booking/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const HotelsHotelIdRoute = HotelsHotelIdRouteImport.update({
-  id: '/hotels/$hotelId',
-  path: '/hotels/$hotelId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BookingSuccessRoute = BookingSuccessRouteImport.update({
@@ -168,9 +156,7 @@ export interface FileRoutesByFullPath {
   '/saved': typeof AuthenticatedSavedRoute
   '/booking/failed': typeof BookingFailedRoute
   '/booking/success': typeof BookingSuccessRoute
-  '/hotels/$hotelId': typeof HotelsHotelIdRoute
   '/booking/': typeof BookingIndexRoute
-  '/hotels/': typeof HotelsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -192,9 +178,7 @@ export interface FileRoutesByTo {
   '/saved': typeof AuthenticatedSavedRoute
   '/booking/failed': typeof BookingFailedRoute
   '/booking/success': typeof BookingSuccessRoute
-  '/hotels/$hotelId': typeof HotelsHotelIdRoute
   '/booking': typeof BookingIndexRoute
-  '/hotels': typeof HotelsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -218,9 +202,7 @@ export interface FileRoutesById {
   '/_authenticated/saved': typeof AuthenticatedSavedRoute
   '/booking/failed': typeof BookingFailedRoute
   '/booking/success': typeof BookingSuccessRoute
-  '/hotels/$hotelId': typeof HotelsHotelIdRoute
   '/booking/': typeof BookingIndexRoute
-  '/hotels/': typeof HotelsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -244,9 +226,7 @@ export interface FileRouteTypes {
     | '/saved'
     | '/booking/failed'
     | '/booking/success'
-    | '/hotels/$hotelId'
     | '/booking/'
-    | '/hotels/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -268,9 +248,7 @@ export interface FileRouteTypes {
     | '/saved'
     | '/booking/failed'
     | '/booking/success'
-    | '/hotels/$hotelId'
     | '/booking'
-    | '/hotels'
   id:
     | '__root__'
     | '/'
@@ -293,9 +271,7 @@ export interface FileRouteTypes {
     | '/_authenticated/saved'
     | '/booking/failed'
     | '/booking/success'
-    | '/hotels/$hotelId'
     | '/booking/'
-    | '/hotels/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -316,9 +292,7 @@ export interface RootRouteChildren {
   TestimonialsRoute: typeof TestimonialsRoute
   BookingFailedRoute: typeof BookingFailedRoute
   BookingSuccessRoute: typeof BookingSuccessRoute
-  HotelsHotelIdRoute: typeof HotelsHotelIdRoute
   BookingIndexRoute: typeof BookingIndexRoute
-  HotelsIndexRoute: typeof HotelsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -428,25 +402,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/hotels/': {
-      id: '/hotels/'
-      path: '/hotels'
-      fullPath: '/hotels/'
-      preLoaderRoute: typeof HotelsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/booking/': {
       id: '/booking/'
       path: '/booking'
       fullPath: '/booking/'
       preLoaderRoute: typeof BookingIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/hotels/$hotelId': {
-      id: '/hotels/$hotelId'
-      path: '/hotels/$hotelId'
-      fullPath: '/hotels/$hotelId'
-      preLoaderRoute: typeof HotelsHotelIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/booking/success': {
@@ -521,20 +481,8 @@ const rootRouteChildren: RootRouteChildren = {
   TestimonialsRoute: TestimonialsRoute,
   BookingFailedRoute: BookingFailedRoute,
   BookingSuccessRoute: BookingSuccessRoute,
-  HotelsHotelIdRoute: HotelsHotelIdRoute,
   BookingIndexRoute: BookingIndexRoute,
-  HotelsIndexRoute: HotelsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

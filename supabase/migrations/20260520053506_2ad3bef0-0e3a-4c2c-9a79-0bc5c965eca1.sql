@@ -1,0 +1,1 @@
+drop policy if exists "room-images public read" on storage.objects;
