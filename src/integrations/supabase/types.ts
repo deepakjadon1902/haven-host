@@ -32,6 +32,7 @@ export type Database = {
           notes: string | null
           pets_allowed: boolean
           reference: string
+          room_id: string | null
           room_type_id: string
           room_type_name: string
           status: Database["public"]["Enums"]["booking_status"]
@@ -58,6 +59,7 @@ export type Database = {
           notes?: string | null
           pets_allowed?: boolean
           reference?: string
+          room_id?: string | null
           room_type_id: string
           room_type_name: string
           status?: Database["public"]["Enums"]["booking_status"]
@@ -84,6 +86,7 @@ export type Database = {
           notes?: string | null
           pets_allowed?: boolean
           reference?: string
+          room_id?: string | null
           room_type_id?: string
           room_type_name?: string
           status?: Database["public"]["Enums"]["booking_status"]
@@ -92,6 +95,56 @@ export type Database = {
           total_cents?: number
           updated_at?: string
           user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bookings_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      hotel_settings: {
+        Row: {
+          address: string
+          city: string
+          contact_email: string
+          contact_phone: string
+          country: string
+          description: string
+          hero_image: string
+          id: boolean
+          name: string
+          tagline: string
+          updated_at: string
+        }
+        Insert: {
+          address?: string
+          city?: string
+          contact_email?: string
+          contact_phone?: string
+          country?: string
+          description?: string
+          hero_image?: string
+          id?: boolean
+          name?: string
+          tagline?: string
+          updated_at?: string
+        }
+        Update: {
+          address?: string
+          city?: string
+          contact_email?: string
+          contact_phone?: string
+          country?: string
+          description?: string
+          hero_image?: string
+          id?: boolean
+          name?: string
+          tagline?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -121,6 +174,104 @@ export type Database = {
           id?: string
           phone?: string | null
           preferences?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      room_inventory: {
+        Row: {
+          created_at: string
+          date: string
+          id: string
+          note: string | null
+          room_id: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          id?: string
+          note?: string | null
+          room_id: string
+          status: string
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          id?: string
+          note?: string | null
+          room_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "room_inventory_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rooms: {
+        Row: {
+          active: boolean
+          amenities: string[]
+          bed_type: string | null
+          cover_image: string | null
+          created_at: string
+          description: string
+          id: string
+          images: string[]
+          max_adults: number
+          max_children: number
+          name: string
+          pets_allowed: boolean
+          price_per_night_cents: number
+          size: string | null
+          slug: string
+          sort_order: number
+          total_units: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          amenities?: string[]
+          bed_type?: string | null
+          cover_image?: string | null
+          created_at?: string
+          description?: string
+          id?: string
+          images?: string[]
+          max_adults?: number
+          max_children?: number
+          name: string
+          pets_allowed?: boolean
+          price_per_night_cents?: number
+          size?: string | null
+          slug: string
+          sort_order?: number
+          total_units?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          amenities?: string[]
+          bed_type?: string | null
+          cover_image?: string | null
+          created_at?: string
+          description?: string
+          id?: string
+          images?: string[]
+          max_adults?: number
+          max_children?: number
+          name?: string
+          pets_allowed?: boolean
+          price_per_night_cents?: number
+          size?: string | null
+          slug?: string
+          sort_order?: number
+          total_units?: number
           updated_at?: string
         }
         Relationships: []
