@@ -78,7 +78,7 @@ export function Navbar() {
           </button>
           {user ? (
             <Button asChild variant="outline" className="rounded-full px-5 font-semibold border-black/15 hover:border-gold text-black hover:text-gold">
-              <Link to="/account"><User className="h-4 w-4" /> Account</Link>
+              <Link to="/admin"><User className="h-4 w-4" /> Admin</Link>
             </Button>
           ) : (
             <Button asChild variant="outline" className="rounded-full px-5 font-semibold border-black/15 hover:border-gold text-black hover:text-gold">
@@ -118,10 +118,10 @@ export function Navbar() {
                 </Link>
               ))}
               <Link
-                to={user ? "/account" : "/login"}
+                to={user ? "/admin" : "/login"}
                 className="px-4 py-3 rounded-xl text-sm font-medium hover:bg-white/5"
               >
-                {user ? "My account" : "Sign in"}
+                {user ? "Admin panel" : "Sign in"}
               </Link>
               <Button asChild className="mt-2 rounded-full font-semibold">
                 <Link to="/rooms">Book a stay</Link>

@@ -1,55 +1,17 @@
-import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { Room } from "@/types/room";
-
-async function assertAdmin(supabase: NonNullable<unknown> & { rpc: (fn: string, params: unknown) => Promise<{ data: unknown; error: { message: string } | null }> }, userId: string) {
-  const { data, error } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
-  if (error) throw new Error(error.message);
-  if (!data) throw new Error("Admin access required");
-}
-
-type DBRoom = {
-  id: string;
-  slug: string;
-  name: string;
-  description: string;
-  price_per_night_cents: number;
-  max_adults: number;
-  max_children: number;
-  pets_allowed: boolean;
-  size: string | null;
-  bed_type: string | null;
-  amenities: string[] | null;
-  images: string[] | null;
-  cover_image: string | null;
-  total_units: number;
-  active: boolean;
-  sort_order: number;
-};
-
-function mapRoom(r: DBRoom): Room {
-  const images = r.images ?? [];
-  return {
-    id: r.id,
-    slug: r.slug,
-    name: r.name,
-    description: r.description ?? "",
-    pricePerNightCents: Number(r.price_per_night_cents ?? 0),
-    pricePerNight: Math.round(Number(r.price_per_night_cents ?? 0) / 100),
-    maxAdults: r.max_adults,
-    maxChildren: r.max_children,
-    petsAllowed: r.pets_allowed,
-    size: r.size,
-    bedType: r.bed_type,
-    amenities: r.amenities ?? [],
-    images,
-    coverImage: r.cover_image ?? images[0] ?? "",
-    totalUnits: r.total_units,
-    active: r.active,
-    sortOrder: r.sort_order,
-  };
-}
+import {
+  cancelBooking,
+  createBooking,
+  deleteRoom,
+  ensureSeeded,
+  getInventoryAndBookings,
+  listBookings,
+  listRooms,
+  setInventory,
+  upsertRoom,
+  updateSettings,
+} from "@/lib/local-store";
 
 const roomSchema = z.object({
   slug: z.string().trim().min(1).max(120).regex(/^[a-z0-9-]+$/, "lowercase letters, numbers and hyphens only"),
@@ -69,259 +31,220 @@ const roomSchema = z.object({
   sort_order: z.number().int().min(0).max(10_000).default(0),
 });
 
-export const adminListRooms = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
-    const { supabase, userId } = context as { supabase: any; userId: string };
-    await assertAdmin(supabase, userId);
-    const { data, error } = await supabase
-      .from("rooms")
-      .select(
-        "id, slug, name, description, price_per_night_cents, max_adults, max_children, pets_allowed, size, bed_type, amenities, images, cover_image, total_units, active, sort_order, created_at",
-      )
-      .order("sort_order", { ascending: true })
-      .order("created_at", { ascending: true });
-    if (error) throw new Error(error.message);
-    return (data ?? []).map((r: DBRoom) => mapRoom(r));
+function fromRoomToDbInput(room: Room) {
+  return {
+    slug: room.slug,
+    name: room.name,
+    description: room.description ?? "",
+    price_per_night_cents: room.pricePerNightCents ?? room.pricePerNight * 100,
+    max_adults: room.maxAdults,
+    max_children: room.maxChildren,
+    pets_allowed: room.petsAllowed,
+    size: room.size ?? null,
+    bed_type: room.bedType ?? null,
+    amenities: room.amenities ?? [],
+    images: room.images ?? [],
+    cover_image: room.coverImage ?? null,
+    total_units: room.totalUnits,
+    active: room.active,
+    sort_order: room.sortOrder ?? 0,
+  };
+}
+
+function fromDbToRoom(data: z.infer<typeof roomSchema> & { id?: string }): Room {
+  const images = data.images ?? [];
+  return {
+    id: data.id ?? "",
+    slug: data.slug,
+    name: data.name,
+    description: data.description ?? "",
+    pricePerNightCents: data.price_per_night_cents,
+    pricePerNight: Math.round(data.price_per_night_cents / 100),
+    maxAdults: data.max_adults,
+    maxChildren: data.max_children,
+    petsAllowed: data.pets_allowed,
+    size: data.size ?? null,
+    bedType: data.bed_type ?? null,
+    amenities: data.amenities ?? [],
+    images,
+    coverImage: data.cover_image ?? images[0] ?? "",
+    totalUnits: data.total_units,
+    active: data.active,
+    sortOrder: data.sort_order,
+  };
+}
+
+export async function adminListRooms(): Promise<Room[]> {
+  ensureSeeded();
+  return listRooms();
+}
+
+export async function adminCreateRoom(input: unknown): Promise<Room> {
+  ensureSeeded();
+  const validated = roomSchema.parse(input);
+  const room = fromDbToRoom({ ...validated });
+  return upsertRoom(room);
+}
+
+export async function adminUpdateRoom(input: unknown): Promise<Room> {
+  ensureSeeded();
+  const validated = z.object({ id: z.string().min(1), patch: roomSchema.partial() }).parse(input);
+  const existing = listRooms().find((r) => r.id === validated.id);
+  if (!existing) throw new Error("Room not found");
+
+  const nextDb = roomSchema.partial().parse({
+    ...fromRoomToDbInput(existing),
+    ...validated.patch,
   });
 
-export const adminCreateRoom = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => roomSchema.parse(input))
-  .handler(async ({ data, context }) => {
-    const { supabase, userId } = context as { supabase: any; userId: string };
-    await assertAdmin(supabase, userId);
-    const { data: row, error } = await supabase.from("rooms").insert(data).select("*").single();
-    if (error) throw new Error(error.message);
-    return mapRoom(row as DBRoom);
-  });
+  const nextRoom = fromDbToRoom({ ...(nextDb as z.infer<typeof roomSchema>), id: existing.id });
+  return upsertRoom(nextRoom);
+}
 
-export const adminUpdateRoom = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
-    z.object({ id: z.string().uuid(), patch: roomSchema.partial() }).parse(input),
-  )
-  .handler(async ({ data, context }) => {
-    const { supabase, userId } = context as { supabase: any; userId: string };
-    await assertAdmin(supabase, userId);
-    const { data: row, error } = await supabase
-      .from("rooms")
-      .update(data.patch)
-      .eq("id", data.id)
-      .select("*")
-      .single();
-    if (error) throw new Error(error.message);
-    return mapRoom(row as DBRoom);
-  });
+export async function adminDeleteRoom(input: unknown): Promise<{ ok: true }> {
+  ensureSeeded();
+  const validated = z.object({ id: z.string().min(1) }).parse(input);
+  deleteRoom(validated.id);
+  return { ok: true };
+}
 
-export const adminDeleteRoom = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
-  .handler(async ({ data, context }) => {
-    const { supabase, userId } = context as { supabase: any; userId: string };
-    await assertAdmin(supabase, userId);
-    const { error } = await supabase.from("rooms").delete().eq("id", data.id);
-    if (error) throw new Error(error.message);
-    return { ok: true };
-  });
+export async function adminListInventory(input: unknown): Promise<{ inventory: unknown[]; bookings: unknown[]; room: { name: string; total_units: number } }> {
+  ensureSeeded();
+  const validated = z
+    .object({
+      roomId: z.string().min(1),
+      from: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+      to: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+    })
+    .parse(input);
+  return getInventoryAndBookings({ roomId: validated.roomId, from: validated.from, to: validated.to });
+}
 
-/* Inventory */
+export async function adminSetInventory(input: unknown): Promise<{ ok: true }> {
+  ensureSeeded();
+  const validated = z
+    .object({
+      roomId: z.string().min(1),
+      date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+      status: z.enum(["closed", "maintenance", "open"]),
+      note: z.string().max(280).optional(),
+    })
+    .parse(input);
+  setInventory(validated);
+  return { ok: true };
+}
 
-export const adminListInventory = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
-    z
-      .object({
-        roomId: z.string().uuid(),
-        from: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-        to: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-      })
-      .parse(input),
-  )
-  .handler(async ({ data, context }) => {
-    const { supabase, userId } = context as { supabase: any; userId: string };
-    await assertAdmin(supabase, userId);
-    const [inv, bks, room] = await Promise.all([
-      supabase
-        .from("room_inventory")
-        .select("date, status, note")
-        .eq("room_id", data.roomId)
-        .gte("date", data.from)
-        .lte("date", data.to),
-      supabase
-        .from("bookings")
-        .select("check_in, check_out, status, reference, guest_full_name")
-        .eq("room_id", data.roomId)
-        .neq("status", "cancelled"),
-      supabase.from("rooms").select("total_units, name").eq("id", data.roomId).single(),
-    ]);
-    if (inv.error) throw new Error(inv.error.message);
-    if (bks.error) throw new Error(bks.error.message);
-    if (room.error) throw new Error(room.error.message);
-    return { inventory: inv.data ?? [], bookings: bks.data ?? [], room: room.data };
-  });
+export async function adminListBookings(): Promise<unknown[]> {
+  ensureSeeded();
+  return listBookings();
+}
 
-export const adminSetInventory = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
-    z
-      .object({
-        roomId: z.string().uuid(),
-        date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-        status: z.enum(["closed", "maintenance", "open"]),
-        note: z.string().max(280).optional(),
-      })
-      .parse(input),
-  )
-  .handler(async ({ data, context }) => {
-    const { supabase, userId } = context as { supabase: any; userId: string };
-    await assertAdmin(supabase, userId);
-    if (data.status === "open") {
-      const { error } = await supabase
-        .from("room_inventory")
-        .delete()
-        .eq("room_id", data.roomId)
-        .eq("date", data.date);
-      if (error) throw new Error(error.message);
-      return { ok: true };
-    }
-    const { error } = await supabase
-      .from("room_inventory")
-      .upsert(
-        { room_id: data.roomId, date: data.date, status: data.status, note: data.note ?? null },
-        { onConflict: "room_id,date" },
-      );
-    if (error) throw new Error(error.message);
-    return { ok: true };
-  });
+export async function adminCancelBooking(input: unknown): Promise<{ ok: true }> {
+  ensureSeeded();
+  const validated = z.object({ id: z.string().min(1) }).parse(input);
+  cancelBooking(validated.id);
+  return { ok: true };
+}
 
-/* Bookings */
+export async function adminDashboardStats(): Promise<{
+  totalRooms: number;
+  totalUnits: number;
+  totalBookings30d: number;
+  occupancyPct: number;
+  revenue30dCents: number;
+  upcoming: Array<{
+    id: string;
+    reference: string;
+    guest_full_name: string;
+    room_type_name: string;
+    check_in: string;
+    check_out: string;
+    status: string;
+  }>;
+  chart: Array<{ date: string; count: number }>;
+}> {
+  ensureSeeded();
+  const todayIso = new Date().toISOString().slice(0, 10);
+  const since30 = new Date(Date.now() - 30 * 86400000).toISOString();
 
-export const adminListBookings = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
-    const { supabase, userId } = context as { supabase: any; userId: string };
-    await assertAdmin(supabase, userId);
-    const { data, error } = await supabase
-      .from("bookings")
-      .select(
-        "id, reference, hotel_name, room_type_name, room_id, check_in, check_out, nights, adults, children, guest_full_name, guest_email, guest_phone, total_cents, currency, status, created_at",
-      )
-      .order("created_at", { ascending: false })
-      .limit(500);
-    if (error) throw new Error(error.message);
-    return data ?? [];
-  });
+  const allBookings = listBookings();
+  const rooms = listRooms();
 
-export const adminCancelBooking = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
-  .handler(async ({ data, context }) => {
-    const { supabase, userId } = context as { supabase: any; userId: string };
-    await assertAdmin(supabase, userId);
-    const { error } = await supabase
-      .from("bookings")
-      .update({ status: "cancelled" })
-      .eq("id", data.id);
-    if (error) throw new Error(error.message);
-    return { ok: true };
-  });
+  const activeRooms = rooms.filter((r) => r.active);
+  const totalRooms = rooms.length;
+  const totalUnits = activeRooms.reduce((sum, r) => sum + (r.totalUnits ?? 0), 0);
 
-/* Dashboard */
+  const last30 = allBookings.filter((b) => b.created_at >= since30);
+  const revenue30dCents = last30
+    .filter((b) => b.status !== "cancelled")
+    .reduce((sum, b) => sum + (b.total_cents ?? 0), 0);
+  const totalBookings30d = last30.length;
 
-export const adminDashboardStats = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
-    const { supabase, userId } = context as { supabase: any; userId: string };
-    await assertAdmin(supabase, userId);
+  // Occupancy today = booked units / total units (active)
+  const bookedToday = allBookings
+    .filter((b) => b.status !== "cancelled" && b.check_in <= todayIso && todayIso < b.check_out)
+    .length;
+  const occupancyPct = totalUnits > 0 ? Math.min(100, Math.round((bookedToday / totalUnits) * 100)) : 0;
 
-    const today = new Date().toISOString().slice(0, 10);
-    const thirtyDaysAgo = new Date(Date.now() - 30 * 86400000).toISOString();
+  const upcoming = allBookings
+    .filter((b) => b.check_in >= todayIso && b.status !== "cancelled")
+    .sort((a, b) => (a.check_in < b.check_in ? -1 : 1))
+    .slice(0, 10)
+    .map((b) => ({
+      id: b.id,
+      reference: b.reference,
+      guest_full_name: b.guest_full_name,
+      room_type_name: b.room_type_name,
+      check_in: b.check_in,
+      check_out: b.check_out,
+      status: b.status,
+    }));
 
-    const [bookingsAgg, upcoming, rooms] = await Promise.all([
-      supabase
-        .from("bookings")
-        .select("total_cents, status, created_at, check_in")
-        .gte("created_at", thirtyDaysAgo),
-      supabase
-        .from("bookings")
-        .select("id, reference, guest_full_name, room_type_name, check_in, check_out, status")
-        .gte("check_in", today)
-        .neq("status", "cancelled")
-        .order("check_in", { ascending: true })
-        .limit(10),
-      supabase.from("rooms").select("id, name, total_units, active"),
-    ]);
+  // Chart = bookings created per day (last 14 days)
+  const toDayStart = (d: Date) => new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
+  const dayIso = (d: Date) => toDayStart(d).toISOString().slice(0, 10);
+  const now = new Date();
+  const chartDays: string[] = [];
+  for (let i = 13; i >= 0; i--) {
+    chartDays.push(dayIso(new Date(now.getTime() - i * 86400000)));
+  }
 
-    if (bookingsAgg.error) throw new Error(bookingsAgg.error.message);
-    if (upcoming.error) throw new Error(upcoming.error.message);
-    if (rooms.error) throw new Error(rooms.error.message);
+  const counts = new Map<string, number>();
+  for (const k of chartDays) counts.set(k, 0);
+  for (const b of allBookings) {
+    const d = (b.created_at ?? "").slice(0, 10);
+    if (counts.has(d)) counts.set(d, (counts.get(d) ?? 0) + 1);
+  }
+  const chart = chartDays.map((date) => ({ date, count: counts.get(date) ?? 0 }));
 
-    const recent = bookingsAgg.data as Array<{ total_cents: number; status: string; created_at: string; check_in: string }>;
-    const revenue30dCents = recent
-      .filter((b) => b.status !== "cancelled")
-      .reduce((s, b) => s + Number(b.total_cents ?? 0), 0);
-    const totalBookings30d = recent.filter((b) => b.status !== "cancelled").length;
+  return {
+    totalRooms,
+    totalUnits,
+    totalBookings30d,
+    occupancyPct,
+    revenue30dCents,
+    upcoming,
+    chart,
+  };
+}
 
-    // Build last 14 days bookings count chart
-    const byDay: Record<string, number> = {};
-    for (let i = 13; i >= 0; i--) {
-      const d = new Date(Date.now() - i * 86400000).toISOString().slice(0, 10);
-      byDay[d] = 0;
-    }
-    for (const b of recent) {
-      const d = b.created_at.slice(0, 10);
-      if (d in byDay) byDay[d]++;
-    }
-    const chart = Object.entries(byDay).map(([date, count]) => ({ date, count }));
+export async function adminUpdateHotelSettings(input: unknown) {
+  ensureSeeded();
+  const validated = z
+    .object({
+      name: z.string().max(120).optional(),
+      tagline: z.string().max(200).optional(),
+      city: z.string().max(120).optional(),
+      country: z.string().max(120).optional(),
+      address: z.string().max(300).optional(),
+      description: z.string().max(5000).optional(),
+      heroImage: z.string().url().max(800).optional(),
+      contactEmail: z.string().email().max(255).optional(),
+      contactPhone: z.string().max(60).optional(),
+    })
+    .parse(input);
+  return updateSettings(validated);
+}
 
-    const totalUnits = (rooms.data as Array<{ total_units: number; active: boolean }>)
-      .filter((r) => r.active)
-      .reduce((s, r) => s + r.total_units, 0);
-
-    // occupancy today
-    const { data: todayBookings } = await supabase
-      .from("bookings")
-      .select("id")
-      .lte("check_in", today)
-      .gt("check_out", today)
-      .neq("status", "cancelled");
-    const occupiedToday = (todayBookings ?? []).length;
-    const occupancyPct = totalUnits > 0 ? Math.round((occupiedToday / totalUnits) * 100) : 0;
-
-    return {
-      revenue30dCents,
-      totalBookings30d,
-      upcoming: upcoming.data ?? [],
-      chart,
-      totalUnits,
-      occupiedToday,
-      occupancyPct,
-      totalRooms: (rooms.data ?? []).length,
-    };
-  });
-
-/* Hotel settings */
-
-const settingsSchema = z.object({
-  name: z.string().min(1).max(120),
-  tagline: z.string().min(1).max(200),
-  city: z.string().min(1).max(80),
-  country: z.string().min(1).max(80),
-  address: z.string().min(1).max(280),
-  description: z.string().min(1).max(2000),
-  hero_image: z.string().url().max(800),
-  contact_email: z.string().email().max(255),
-  contact_phone: z.string().min(4).max(40),
-});
-
-export const adminUpdateSettings = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => settingsSchema.parse(input))
-  .handler(async ({ data, context }) => {
-    const { supabase, userId } = context as { supabase: any; userId: string };
-    await assertAdmin(supabase, userId);
-    const { error } = await supabase.from("hotel_settings").update(data).eq("id", true);
-    if (error) throw new Error(error.message);
-    return { ok: true };
-  });
+// Exported for booking flow (client-only, no backend)
+export { createBooking };

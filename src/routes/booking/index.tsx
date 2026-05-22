@@ -12,7 +12,7 @@ import { SiteLayout } from "@/components/site/SiteLayout";
 import { Button } from "@/components/ui/button";
 import type { RoomAvailabilityMap, Room } from "@/types/room";
 import { getPublicRoomById, getRoomAvailability } from "@/lib/rooms.functions";
-import { supabase } from "@/integrations/supabase/client";
+import { createBooking } from "@/lib/local-store";
 import { useAuth } from "@/hooks/useAuth";
 
 type Search = { hotel?: string; room?: string; date?: string };
@@ -198,11 +198,6 @@ function BookingPage() {
   };
 
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
-    if (!user) {
-      toast.error("Please sign in to confirm your reservation.");
-      navigate({ to: "/login", search: { redirect: "/booking" } as never });
-      return;
-    }
     if (!roomType) return;
     if (isDateRangeAvailable === false) {
       toast.error("Selected dates are not available. Please choose different dates.");
@@ -212,38 +207,22 @@ function BookingPage() {
     const taxesCents = Math.round(subtotalCents * 0.12);
     const totalCents = subtotalCents + taxesCents;
 
-    const { data: inserted, error } = await supabase
-      .from("bookings")
-      .insert({
-        user_id: user.id,
-        hotel_slug: "maison-noir",
-        hotel_name: "Maison Noir",
-        room_type_id: roomType.id,
-        room_type_name: roomType.name,
-        room_id: roomType.id,
-        check_in: checkIn,
-        check_out: checkOut,
-        nights,
-        adults: data.adults.length,
-        children: data.children.length,
-        guest_full_name: data.fullName,
-        guest_email: data.email,
-        guest_phone: data.phone,
-        pets_allowed: data.pets === "yes",
-        subtotal_cents: subtotalCents,
-        taxes_cents: taxesCents,
-        total_cents: totalCents,
-        currency: "INR",
-        status: "confirmed",
-      })
-      .select("reference")
-      .single();
-
-    if (error) {
-      toast.error(error.message);
-      navigate({ to: "/booking/failed" });
-      return;
-    }
+    const inserted = createBooking({
+      hotel_name: "Maison Noir",
+      room_type_name: roomType.name,
+      room_id: roomType.id,
+      check_in: checkIn,
+      check_out: checkOut,
+      nights,
+      adults: data.adults.length,
+      children: data.children.length,
+      guest_full_name: data.fullName,
+      guest_email: data.email,
+      guest_phone: data.phone,
+      total_cents: totalCents,
+      currency: "INR",
+      status: "confirmed",
+    });
     toast.success("Reservation confirmed.");
     navigate({
       to: "/booking/success",

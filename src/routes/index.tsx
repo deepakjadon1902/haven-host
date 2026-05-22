@@ -63,9 +63,9 @@ function Hero() {
         <img
           src="https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=2400&q=80"
           alt=""
-          className="h-full w-full object-cover"
+          className="h-full w-full object-cover brightness-[0.55] saturate-75 contrast-110"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/85 via-black/70 to-black/95" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/90 via-black/80 to-black/95" />
         <div className="absolute inset-0 hero-radial opacity-35" />
       </div>
 

@@ -4,7 +4,6 @@ import { motion } from "framer-motion";
 import { LayoutDashboard, Package, Calendar, ShoppingCart, Settings, LogOut, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
@@ -13,14 +12,12 @@ export const Route = createFileRoute("/_authenticated/admin")({
   component: AdminLayout,
 });
 
-const ADMIN_EMAIL = "deepakjadon1907@gmail.com";
-
 interface AdminLayoutProps {
   children?: React.ReactNode;
 }
 
 function AdminLayout() {
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -32,22 +29,13 @@ function AdminLayout() {
       return;
     }
 
-    // Check if user is admin
-    const checkAdminStatus = async () => {
-      const { data, error } = await supabase.rpc("has_role", {
-        _user_id: user.id,
-        _role: "admin",
-      });
+    if (user.role !== "admin") {
+      navigate({ to: "/" });
+      return;
+    }
 
-      if (error || !data) {
-        navigate({ to: "/account" });
-      } else {
-        setIsAdmin(true);
-      }
-      setLoading(false);
-    };
-
-    checkAdminStatus();
+    setIsAdmin(true);
+    setLoading(false);
   }, [user, navigate]);
 
   if (loading) {
@@ -123,7 +111,7 @@ function AdminLayout() {
           )}
           <Button
             onClick={async () => {
-              await supabase.auth.signOut();
+              await signOut();
               navigate({ to: "/" });
             }}
             variant="outline"

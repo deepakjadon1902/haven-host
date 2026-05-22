@@ -1,45 +1,43 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { useRouter } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import type { Session, User } from "@supabase/supabase-js";
-import { supabase } from "@/integrations/supabase/client";
+import { getLocalUser, signInWithPassword as localSignInWithPassword, signOut as localSignOut, type LocalUser } from "@/lib/local-auth";
 
 type AuthContextValue = {
-  session: Session | null;
-  user: User | null;
+  user: LocalUser | null;
   loading: boolean;
+  signInWithPassword: (input: { email: string; password: string }) => Promise<{ user: LocalUser | null; error: string | null }>;
   signOut: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [session, setSession] = useState<Session | null>(null);
+  const [user, setUser] = useState<LocalUser | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    // 1) Listener first
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, s) => {
-      setSession(s);
-      router.invalidate();
-      queryClient.invalidateQueries();
-    });
-    // 2) Then read existing session
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
-      setLoading(false);
-    });
-    return () => sub.subscription.unsubscribe();
-  }, [router, queryClient]);
+    setUser(getLocalUser());
+    setLoading(false);
+  }, []);
 
   const value: AuthContextValue = {
-    session,
-    user: session?.user ?? null,
+    user,
     loading,
+    signInWithPassword: async (input) => {
+      const res = localSignInWithPassword(input);
+      setUser(res.user);
+      router.invalidate();
+      queryClient.invalidateQueries();
+      return res;
+    },
     signOut: async () => {
-      await supabase.auth.signOut();
+      localSignOut();
+      setUser(null);
+      router.invalidate();
+      queryClient.invalidateQueries();
     },
   };
 

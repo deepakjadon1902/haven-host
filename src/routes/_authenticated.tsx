@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet, useNavigate, useRouterState, Link } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { Loader2, User as UserIcon, CalendarCheck, Heart, LogOut } from "lucide-react";
+import { Loader2, LayoutDashboard, Package, Calendar, ShoppingCart, Settings, LogOut } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
@@ -12,9 +12,11 @@ export const Route = createFileRoute("/_authenticated")({
 });
 
 const nav = [
-  { to: "/account", label: "Profile", icon: UserIcon },
-  { to: "/bookings", label: "Bookings", icon: CalendarCheck },
-  { to: "/saved", label: "Saved", icon: Heart },
+  { to: "/admin", label: "Dashboard", icon: LayoutDashboard },
+  { to: "/admin/rooms", label: "Rooms", icon: Package },
+  { to: "/admin/calendar", label: "Inventory", icon: Calendar },
+  { to: "/admin/bookings", label: "Bookings", icon: ShoppingCart },
+  { to: "/admin/settings", label: "Settings", icon: Settings },
 ] as const;
 
 function AuthenticatedLayout() {
@@ -51,15 +53,10 @@ function AuthenticatedLayout() {
               <div className="rounded-3xl border border-white/10 p-6 bg-card">
                 <div className="flex items-center gap-3">
                   <div className="h-12 w-12 rounded-full gold-gradient grid place-items-center text-black font-display font-bold text-lg">
-                    {(user.user_metadata?.full_name ?? user.email ?? "M")
-                      .toString()
-                      .charAt(0)
-                      .toUpperCase()}
+                    {(user.email ?? "A").toString().charAt(0).toUpperCase()}
                   </div>
                   <div className="min-w-0">
-                    <p className="font-semibold truncate">
-                      {user.user_metadata?.full_name || "Member"}
-                    </p>
+                    <p className="font-semibold truncate">Admin</p>
                     <p className="text-xs text-white/55 truncate">{user.email}</p>
                   </div>
                 </div>

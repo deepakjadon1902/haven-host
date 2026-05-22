@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import type { HotelSettings } from "@/types/room";
 import { getHotelSettings } from "@/lib/rooms.functions";
-import { adminUpdateSettings } from "@/lib/admin.functions";
+import { adminUpdateHotelSettings } from "@/lib/admin.functions";
 
 export const Route = createFileRoute("/_authenticated/admin/settings")({
   head: () => ({
@@ -44,16 +44,16 @@ function AdminSettings() {
     if (!settings) return;
     setIsSaving(true);
     try {
-      await adminUpdateSettings({
+      await adminUpdateHotelSettings({
         name: settings.name.trim(),
         tagline: settings.tagline.trim(),
         city: settings.city.trim(),
         country: settings.country.trim(),
         address: settings.address.trim(),
         description: settings.description.trim(),
-        hero_image: heroImage.trim(),
-        contact_email: settings.contactEmail.trim(),
-        contact_phone: settings.contactPhone.trim(),
+        heroImage: heroImage.trim(),
+        contactEmail: settings.contactEmail.trim(),
+        contactPhone: settings.contactPhone.trim(),
       });
       toast.success("Settings saved");
     } catch (error) {
@@ -208,4 +208,3 @@ function AdminSettings() {
     </div>
   );
 }
-
