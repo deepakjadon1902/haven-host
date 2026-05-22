@@ -5,6 +5,8 @@ const ROOMS_KEY = "haven.rooms.v1";
 const INVENTORY_KEY = "haven.inventory.v1";
 const BOOKINGS_KEY = "haven.bookings.v1";
 const SETTINGS_KEY = "haven.settings.v1";
+const LAST_EMAIL_KEY = "haven.lastBookingEmail.v1";
+const PAYMENT_DRAFT_KEY = "haven.paymentDraft.v1";
 
 type InventoryStatus = "closed" | "maintenance";
 type InventoryRow = { room_id: string; date: string; status: InventoryStatus; note: string | null };
@@ -28,6 +30,8 @@ export type LocalBooking = {
   currency: string;
   status: BookingStatus;
   created_at: string;
+  payment_status?: "unpaid" | "paid" | "failed";
+  payment_reference?: string;
 };
 
 function isBrowser() {
@@ -260,6 +264,22 @@ export function listBookings(): LocalBooking[] {
   return readJson<LocalBooking[]>(BOOKINGS_KEY) ?? [];
 }
 
+export function setLastBookingEmail(email: string) {
+  if (!isBrowser()) return;
+  window.localStorage.setItem(LAST_EMAIL_KEY, email.trim().toLowerCase());
+}
+
+export function getLastBookingEmail(): string {
+  if (!isBrowser()) return "";
+  return (window.localStorage.getItem(LAST_EMAIL_KEY) ?? "").trim().toLowerCase();
+}
+
+export function listBookingsByEmail(email: string): LocalBooking[] {
+  const q = email.trim().toLowerCase();
+  if (!q) return [];
+  return listBookings().filter((b) => (b.guest_email ?? "").trim().toLowerCase() === q);
+}
+
 function writeBookings(rows: LocalBooking[]) {
   writeJson(BOOKINGS_KEY, rows);
 }
@@ -280,7 +300,10 @@ export function createBooking(input: Omit<LocalBooking, "id" | "created_at" | "s
     status: input.status ?? "confirmed",
   };
 
-  if (isBrowser()) writeBookings([row, ...listBookings()]);
+  if (isBrowser()) {
+    writeBookings([row, ...listBookings()]);
+    setLastBookingEmail(row.guest_email);
+  }
   return row;
 }
 
@@ -309,3 +332,31 @@ export function getInventoryAndBookings(input: { roomId: string; from: string; t
   return { inventory, bookings, room: room ? { total_units: room.totalUnits, name: room.name } : { total_units: 1, name: "Room" } };
 }
 
+export type PaymentDraft = {
+  room_id: string;
+  room_type_name: string;
+  check_in: string;
+  check_out: string;
+  nights: number;
+  adults: number;
+  children: number;
+  guest_full_name: string;
+  guest_email: string;
+  guest_phone: string;
+  total_cents: number;
+  currency: string;
+};
+
+export function savePaymentDraft(draft: PaymentDraft) {
+  if (!isBrowser()) return;
+  writeJson(PAYMENT_DRAFT_KEY, draft);
+}
+
+export function readPaymentDraft(): PaymentDraft | null {
+  return readJson<PaymentDraft>(PAYMENT_DRAFT_KEY);
+}
+
+export function clearPaymentDraft() {
+  if (!isBrowser()) return;
+  window.localStorage.removeItem(PAYMENT_DRAFT_KEY);
+}

@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
-import { Check, Download, Home } from "lucide-react";
+import { Check, Home } from "lucide-react";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { Button } from "@/components/ui/button";
 
@@ -45,7 +45,7 @@ function SuccessPage() {
           transition={{ delay: 0.3 }}
           className="mt-4 text-lg text-gray-700"
         >
-          Your booking is confirmed. You can find it anytime under your account.
+          Your booking is confirmed. You can find it anytime under My bookings.
         </motion.p>
 
         <motion.div
@@ -59,8 +59,8 @@ function SuccessPage() {
         </motion.div>
 
         <div className="mt-10 flex flex-wrap justify-center gap-3">
-          <Button className="h-11 rounded-full px-6 font-semibold">
-            <Download className="h-4 w-4" /> Download invoice
+          <Button asChild className="h-11 rounded-full px-6 font-semibold">
+            <Link to="/my-bookings">View my bookings</Link>
           </Button>
           <Button asChild variant="outline" className="h-11 rounded-full px-6 font-semibold border-black/15 text-black hover:bg-gray-50">
             <Link to="/">
@@ -72,4 +72,3 @@ function SuccessPage() {
     </SiteLayout>
   );
 }
-

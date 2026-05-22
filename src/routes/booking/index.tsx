@@ -12,8 +12,7 @@ import { SiteLayout } from "@/components/site/SiteLayout";
 import { Button } from "@/components/ui/button";
 import type { RoomAvailabilityMap, Room } from "@/types/room";
 import { getPublicRoomById, getRoomAvailability } from "@/lib/rooms.functions";
-import { createBooking } from "@/lib/local-store";
-import { useAuth } from "@/hooks/useAuth";
+import { savePaymentDraft } from "@/lib/local-store";
 
 type Search = { hotel?: string; room?: string; date?: string };
 
@@ -61,7 +60,6 @@ const steps = ["Stay", "Guests", "Payment"] as const;
 function BookingPage() {
   const search = Route.useSearch();
   const navigate = useNavigate();
-  const { user } = useAuth();
 
   const roomId = search.room;
   const [roomType, setRoomType] = useState<Room | null>(null);
@@ -207,10 +205,9 @@ function BookingPage() {
     const taxesCents = Math.round(subtotalCents * 0.12);
     const totalCents = subtotalCents + taxesCents;
 
-    const inserted = createBooking({
-      hotel_name: "Maison Noir",
-      room_type_name: roomType.name,
+    savePaymentDraft({
       room_id: roomType.id,
+      room_type_name: roomType.name,
       check_in: checkIn,
       check_out: checkOut,
       nights,
@@ -221,13 +218,9 @@ function BookingPage() {
       guest_phone: data.phone,
       total_cents: totalCents,
       currency: "INR",
-      status: "confirmed",
     });
-    toast.success("Reservation confirmed.");
-    navigate({
-      to: "/booking/success",
-      search: { ref: inserted.reference, hotel: "maison-noir", room: roomType.id } as never,
-    });
+
+    navigate({ to: "/payment" });
   };
 
   if (roomLoading) {

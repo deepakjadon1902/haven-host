@@ -15,7 +15,9 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as RoomsRouteImport } from './routes/rooms'
 import { Route as RefundRouteImport } from './routes/refund'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as PaymentRouteImport } from './routes/payment'
 import { Route as OffersRouteImport } from './routes/offers'
+import { Route as MyBookingsRouteImport } from './routes/my-bookings'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as HotelsRouteImport } from './routes/hotels'
 import { Route as GalleryRouteImport } from './routes/gallery'
@@ -25,8 +27,10 @@ import { Route as BlogsRouteImport } from './routes/blogs'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as RoomsIndexRouteImport } from './routes/rooms/index'
 import { Route as BookingIndexRouteImport } from './routes/booking/index'
 import { Route as RoomsSlugRouteImport } from './routes/rooms/$slug'
+import { Route as MyBookingsIdRouteImport } from './routes/my-bookings/$id'
 import { Route as BookingSuccessRouteImport } from './routes/booking/success'
 import { Route as BookingFailedRouteImport } from './routes/booking/failed'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
@@ -66,9 +70,19 @@ const PrivacyRoute = PrivacyRouteImport.update({
   path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PaymentRoute = PaymentRouteImport.update({
+  id: '/payment',
+  path: '/payment',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OffersRoute = OffersRouteImport.update({
   id: '/offers',
   path: '/offers',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MyBookingsRoute = MyBookingsRouteImport.update({
+  id: '/my-bookings',
+  path: '/my-bookings',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -115,6 +129,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RoomsIndexRoute = RoomsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => RoomsRoute,
+} as any)
 const BookingIndexRoute = BookingIndexRouteImport.update({
   id: '/booking/',
   path: '/booking/',
@@ -124,6 +143,11 @@ const RoomsSlugRoute = RoomsSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
   getParentRoute: () => RoomsRoute,
+} as any)
+const MyBookingsIdRoute = MyBookingsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => MyBookingsRoute,
 } as any)
 const BookingSuccessRoute = BookingSuccessRouteImport.update({
   id: '/booking/success',
@@ -178,7 +202,9 @@ export interface FileRoutesByFullPath {
   '/gallery': typeof GalleryRoute
   '/hotels': typeof HotelsRoute
   '/login': typeof LoginRoute
+  '/my-bookings': typeof MyBookingsRouteWithChildren
   '/offers': typeof OffersRoute
+  '/payment': typeof PaymentRoute
   '/privacy': typeof PrivacyRoute
   '/refund': typeof RefundRoute
   '/rooms': typeof RoomsRouteWithChildren
@@ -188,8 +214,10 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/booking/failed': typeof BookingFailedRoute
   '/booking/success': typeof BookingSuccessRoute
+  '/my-bookings/$id': typeof MyBookingsIdRoute
   '/rooms/$slug': typeof RoomsSlugRoute
   '/booking/': typeof BookingIndexRoute
+  '/rooms/': typeof RoomsIndexRoute
   '/admin/bookings': typeof AuthenticatedAdminBookingsRoute
   '/admin/calendar': typeof AuthenticatedAdminCalendarRoute
   '/admin/rooms': typeof AuthenticatedAdminRoomsRoute
@@ -205,17 +233,20 @@ export interface FileRoutesByTo {
   '/gallery': typeof GalleryRoute
   '/hotels': typeof HotelsRoute
   '/login': typeof LoginRoute
+  '/my-bookings': typeof MyBookingsRouteWithChildren
   '/offers': typeof OffersRoute
+  '/payment': typeof PaymentRoute
   '/privacy': typeof PrivacyRoute
   '/refund': typeof RefundRoute
-  '/rooms': typeof RoomsRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/testimonials': typeof TestimonialsRoute
   '/booking/failed': typeof BookingFailedRoute
   '/booking/success': typeof BookingSuccessRoute
+  '/my-bookings/$id': typeof MyBookingsIdRoute
   '/rooms/$slug': typeof RoomsSlugRoute
   '/booking': typeof BookingIndexRoute
+  '/rooms': typeof RoomsIndexRoute
   '/admin/bookings': typeof AuthenticatedAdminBookingsRoute
   '/admin/calendar': typeof AuthenticatedAdminCalendarRoute
   '/admin/rooms': typeof AuthenticatedAdminRoomsRoute
@@ -233,7 +264,9 @@ export interface FileRoutesById {
   '/gallery': typeof GalleryRoute
   '/hotels': typeof HotelsRoute
   '/login': typeof LoginRoute
+  '/my-bookings': typeof MyBookingsRouteWithChildren
   '/offers': typeof OffersRoute
+  '/payment': typeof PaymentRoute
   '/privacy': typeof PrivacyRoute
   '/refund': typeof RefundRoute
   '/rooms': typeof RoomsRouteWithChildren
@@ -243,8 +276,10 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/booking/failed': typeof BookingFailedRoute
   '/booking/success': typeof BookingSuccessRoute
+  '/my-bookings/$id': typeof MyBookingsIdRoute
   '/rooms/$slug': typeof RoomsSlugRoute
   '/booking/': typeof BookingIndexRoute
+  '/rooms/': typeof RoomsIndexRoute
   '/_authenticated/admin/bookings': typeof AuthenticatedAdminBookingsRoute
   '/_authenticated/admin/calendar': typeof AuthenticatedAdminCalendarRoute
   '/_authenticated/admin/rooms': typeof AuthenticatedAdminRoomsRoute
@@ -262,7 +297,9 @@ export interface FileRouteTypes {
     | '/gallery'
     | '/hotels'
     | '/login'
+    | '/my-bookings'
     | '/offers'
+    | '/payment'
     | '/privacy'
     | '/refund'
     | '/rooms'
@@ -272,8 +309,10 @@ export interface FileRouteTypes {
     | '/admin'
     | '/booking/failed'
     | '/booking/success'
+    | '/my-bookings/$id'
     | '/rooms/$slug'
     | '/booking/'
+    | '/rooms/'
     | '/admin/bookings'
     | '/admin/calendar'
     | '/admin/rooms'
@@ -289,17 +328,20 @@ export interface FileRouteTypes {
     | '/gallery'
     | '/hotels'
     | '/login'
+    | '/my-bookings'
     | '/offers'
+    | '/payment'
     | '/privacy'
     | '/refund'
-    | '/rooms'
     | '/sitemap.xml'
     | '/terms'
     | '/testimonials'
     | '/booking/failed'
     | '/booking/success'
+    | '/my-bookings/$id'
     | '/rooms/$slug'
     | '/booking'
+    | '/rooms'
     | '/admin/bookings'
     | '/admin/calendar'
     | '/admin/rooms'
@@ -316,7 +358,9 @@ export interface FileRouteTypes {
     | '/gallery'
     | '/hotels'
     | '/login'
+    | '/my-bookings'
     | '/offers'
+    | '/payment'
     | '/privacy'
     | '/refund'
     | '/rooms'
@@ -326,8 +370,10 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/booking/failed'
     | '/booking/success'
+    | '/my-bookings/$id'
     | '/rooms/$slug'
     | '/booking/'
+    | '/rooms/'
     | '/_authenticated/admin/bookings'
     | '/_authenticated/admin/calendar'
     | '/_authenticated/admin/rooms'
@@ -345,7 +391,9 @@ export interface RootRouteChildren {
   GalleryRoute: typeof GalleryRoute
   HotelsRoute: typeof HotelsRoute
   LoginRoute: typeof LoginRoute
+  MyBookingsRoute: typeof MyBookingsRouteWithChildren
   OffersRoute: typeof OffersRoute
+  PaymentRoute: typeof PaymentRoute
   PrivacyRoute: typeof PrivacyRoute
   RefundRoute: typeof RefundRoute
   RoomsRoute: typeof RoomsRouteWithChildren
@@ -401,11 +449,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/payment': {
+      id: '/payment'
+      path: '/payment'
+      fullPath: '/payment'
+      preLoaderRoute: typeof PaymentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/offers': {
       id: '/offers'
       path: '/offers'
       fullPath: '/offers'
       preLoaderRoute: typeof OffersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/my-bookings': {
+      id: '/my-bookings'
+      path: '/my-bookings'
+      fullPath: '/my-bookings'
+      preLoaderRoute: typeof MyBookingsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -471,6 +533,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/rooms/': {
+      id: '/rooms/'
+      path: '/'
+      fullPath: '/rooms/'
+      preLoaderRoute: typeof RoomsIndexRouteImport
+      parentRoute: typeof RoomsRoute
+    }
     '/booking/': {
       id: '/booking/'
       path: '/booking'
@@ -484,6 +553,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/rooms/$slug'
       preLoaderRoute: typeof RoomsSlugRouteImport
       parentRoute: typeof RoomsRoute
+    }
+    '/my-bookings/$id': {
+      id: '/my-bookings/$id'
+      path: '/$id'
+      fullPath: '/my-bookings/$id'
+      preLoaderRoute: typeof MyBookingsIdRouteImport
+      parentRoute: typeof MyBookingsRoute
     }
     '/booking/success': {
       id: '/booking/success'
@@ -575,12 +651,26 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
   AuthenticatedRouteChildren,
 )
 
+interface MyBookingsRouteChildren {
+  MyBookingsIdRoute: typeof MyBookingsIdRoute
+}
+
+const MyBookingsRouteChildren: MyBookingsRouteChildren = {
+  MyBookingsIdRoute: MyBookingsIdRoute,
+}
+
+const MyBookingsRouteWithChildren = MyBookingsRoute._addFileChildren(
+  MyBookingsRouteChildren,
+)
+
 interface RoomsRouteChildren {
   RoomsSlugRoute: typeof RoomsSlugRoute
+  RoomsIndexRoute: typeof RoomsIndexRoute
 }
 
 const RoomsRouteChildren: RoomsRouteChildren = {
   RoomsSlugRoute: RoomsSlugRoute,
+  RoomsIndexRoute: RoomsIndexRoute,
 }
 
 const RoomsRouteWithChildren = RoomsRoute._addFileChildren(RoomsRouteChildren)
@@ -595,7 +685,9 @@ const rootRouteChildren: RootRouteChildren = {
   GalleryRoute: GalleryRoute,
   HotelsRoute: HotelsRoute,
   LoginRoute: LoginRoute,
+  MyBookingsRoute: MyBookingsRouteWithChildren,
   OffersRoute: OffersRoute,
+  PaymentRoute: PaymentRoute,
   PrivacyRoute: PrivacyRoute,
   RefundRoute: RefundRoute,
   RoomsRoute: RoomsRouteWithChildren,

@@ -8,6 +8,7 @@ import { useAuth } from "@/hooks/useAuth";
 const nav = [
   { to: "/", label: "Home" },
   { to: "/rooms", label: "Rooms" },
+  { to: "/my-bookings", label: "My bookings" },
   { to: "/offers", label: "Offers" },
   { to: "/about", label: "About" },
   { to: "/contact", label: "Contact" },
@@ -82,7 +83,7 @@ export function Navbar() {
             </Button>
           ) : (
             <Button asChild variant="outline" className="rounded-full px-5 font-semibold border-black/15 hover:border-gold text-black hover:text-gold">
-              <Link to="/login">Sign in</Link>
+              <Link to="/login">Admin</Link>
             </Button>
           )}
           <Button asChild className="rounded-full px-5 font-semibold">
