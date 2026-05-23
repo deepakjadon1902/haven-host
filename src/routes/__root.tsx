@@ -75,10 +75,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Maison Noir — Luxury Hotel Reservations" },
-      { name: "description", content: "Curated luxury hotel reservations with real-time availability." },
+      {
+        name: "description",
+        content: "Curated luxury hotel reservations with real-time availability.",
+      },
       { name: "author", content: "Maison Noir" },
       { property: "og:title", content: "Maison Noir — Luxury Hotel Reservations" },
-      { property: "og:description", content: "Curated luxury hotel reservations with real-time availability." },
+      {
+        property: "og:description",
+        content: "Curated luxury hotel reservations with real-time availability.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },

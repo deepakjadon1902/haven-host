@@ -15,7 +15,8 @@ export const Route = createFileRoute("/")({
       { title: "Maison Noir — Royal rooms with live availability" },
       {
         name: "description",
-        content: "A single hotel with room showcase, live inventory, and a clean, royal booking experience.",
+        content:
+          "A single hotel with room showcase, live inventory, and a clean, royal booking experience.",
       },
     ],
   }),
@@ -84,8 +85,7 @@ function Hero() {
           transition={{ delay: 0.1 }}
           className="mt-6 max-w-5xl font-display text-5xl font-semibold leading-[0.95] text-white md:text-7xl lg:text-[5.5rem]"
         >
-          Maison Noir,{" "}
-          <span className="gold-text italic font-serif">crafted for calm.</span>
+          Maison Noir, <span className="gold-text italic font-serif">crafted for calm.</span>
         </motion.h1>
 
         <motion.p
@@ -94,7 +94,8 @@ function Hero() {
           transition={{ delay: 0.18 }}
           className="mt-6 max-w-2xl text-lg leading-relaxed text-white/80 md:text-xl"
         >
-          Rooms are managed by the owner in the admin panel — guests book only what’s truly available.
+          Rooms are managed by the owner in the admin panel — guests book only what’s truly
+          available.
         </motion.p>
 
         <motion.div
@@ -150,12 +151,22 @@ function Hero() {
   );
 }
 
-function Field({ icon, label, children }: { icon: React.ReactNode; label: string; children: React.ReactNode }) {
+function Field({
+  icon,
+  label,
+  children,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  children: React.ReactNode;
+}) {
   return (
     <label className="flex items-center gap-3 rounded-xl border border-white/15 bg-black/15 px-4 py-3">
       <span className="text-gold">{icon}</span>
       <span className="min-w-0 flex-1">
-        <span className="block text-[10px] font-semibold uppercase tracking-widest text-white/55">{label}</span>
+        <span className="block text-[10px] font-semibold uppercase tracking-widest text-white/55">
+          {label}
+        </span>
         {children}
       </span>
     </label>
@@ -163,7 +174,14 @@ function Field({ icon, label, children }: { icon: React.ReactNode; label: string
 }
 
 function Featured({ rooms, loading }: { rooms: Room[]; loading: boolean }) {
-  const featured = useMemo(() => rooms.slice().sort((a, b) => a.sortOrder - b.sortOrder).slice(0, 3), [rooms]);
+  const featured = useMemo(
+    () =>
+      rooms
+        .slice()
+        .sort((a, b) => a.sortOrder - b.sortOrder)
+        .slice(0, 3),
+    [rooms],
+  );
 
   return (
     <section className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
@@ -171,11 +189,14 @@ function Featured({ rooms, loading }: { rooms: Room[]; loading: boolean }) {
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.25em] text-gold">Rooms</p>
           <h2 className="mt-3 max-w-xl font-display text-4xl font-semibold leading-tight text-black md:text-5xl">
-            Designed for a{" "}
-            <span className="gold-text italic">royal rest.</span>
+            Designed for a <span className="gold-text italic">royal rest.</span>
           </h2>
         </div>
-        <Button asChild variant="outline" className="rounded-full border-black/15 text-black hover:border-gold hover:text-gold">
+        <Button
+          asChild
+          variant="outline"
+          className="rounded-full border-black/15 text-black hover:border-gold hover:text-gold"
+        >
           <Link to="/rooms">
             View all <ArrowRight className="h-4 w-4" />
           </Link>
@@ -197,8 +218,14 @@ function Featured({ rooms, loading }: { rooms: Room[]; loading: boolean }) {
 
 function Why() {
   const items = [
-    { title: "Owner-controlled inventory", body: "Rooms, units, and maintenance blocks are managed in the admin panel." },
-    { title: "Calendar-aligned booking", body: "Bookings reduce availability per day. Full days become read-only booked." },
+    {
+      title: "Owner-controlled inventory",
+      body: "Rooms, units, and maintenance blocks are managed in the admin panel.",
+    },
+    {
+      title: "Calendar-aligned booking",
+      body: "Bookings reduce availability per day. Full days become read-only booked.",
+    },
     { title: "Transparent totals", body: "Clear pricing with taxes shown before confirmation." },
   ];
 
@@ -206,13 +233,15 @@ function Why() {
     <section className="border-t border-black/10 bg-white">
       <div className="mx-auto grid max-w-7xl gap-10 px-5 py-20 lg:grid-cols-[1fr_1.4fr] lg:gap-16 lg:px-8">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.25em] text-gold">Why Maison Noir</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.25em] text-gold">
+            Why Maison Noir
+          </p>
           <h2 className="mt-3 font-display text-4xl font-semibold leading-tight text-black md:text-5xl">
-            Calm, clean,{" "}
-            <span className="gold-text italic">royal</span>.
+            Calm, clean, <span className="gold-text italic">royal</span>.
           </h2>
           <p className="mt-5 max-w-md text-sm leading-relaxed text-gray-700">
-            A single-property system: the hotel owner controls rooms, availability, and bookings — guests get a smooth experience.
+            A single-property system: the hotel owner controls rooms, availability, and bookings —
+            guests get a smooth experience.
           </p>
         </div>
         <div className="grid gap-4">
@@ -252,7 +281,9 @@ function Stats() {
       {stats.map((s) => (
         <div key={s.l} className="rounded-2xl border border-black/10 bg-white p-8 text-center">
           <p className="gold-text font-display text-4xl font-semibold md:text-5xl">{s.v}</p>
-          <p className="mt-2 text-xs font-semibold uppercase tracking-widest text-gray-700">{s.l}</p>
+          <p className="mt-2 text-xs font-semibold uppercase tracking-widest text-gray-700">
+            {s.l}
+          </p>
         </div>
       ))}
     </section>

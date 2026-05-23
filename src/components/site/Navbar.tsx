@@ -1,17 +1,15 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Menu, X, Search, User } from "lucide-react";
+import { Menu, X, User } from "lucide-react";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 
 const nav = [
-  { to: "/", label: "Home" },
   { to: "/rooms", label: "Rooms" },
   { to: "/my-bookings", label: "My bookings" },
   { to: "/offers", label: "Offers" },
-  { to: "/about", label: "About" },
-  { to: "/contact", label: "Contact" },
+  { to: "/gallery", label: "Gallery" },
 ] as const;
 
 export function Navbar() {
@@ -49,7 +47,8 @@ export function Navbar() {
 
         <nav className="hidden lg:flex items-center gap-1">
           {nav.map((item) => {
-            const active = pathname === item.to || (item.to !== "/" && pathname.startsWith(item.to));
+            const active =
+              pathname === item.to || (item.to !== "/" && pathname.startsWith(item.to));
             return (
               <Link
                 key={item.to}
@@ -71,23 +70,18 @@ export function Navbar() {
         </nav>
 
         <div className="hidden lg:flex items-center gap-3">
-          <button
-            aria-label="Search"
-            className="h-10 w-10 grid place-items-center rounded-full border border-black/15 hover:border-gold hover:text-gold transition"
+          <Button
+            asChild
+            variant="outline"
+            className="rounded-full px-5 font-semibold border-black/15 hover:border-gold text-black hover:text-gold"
           >
-            <Search className="h-4 w-4" />
-          </button>
-          {user ? (
-            <Button asChild variant="outline" className="rounded-full px-5 font-semibold border-black/15 hover:border-gold text-black hover:text-gold">
-              <Link to="/admin"><User className="h-4 w-4" /> Admin</Link>
-            </Button>
-          ) : (
-            <Button asChild variant="outline" className="rounded-full px-5 font-semibold border-black/15 hover:border-gold text-black hover:text-gold">
-              <Link to="/login">Admin</Link>
-            </Button>
-          )}
-          <Button asChild className="rounded-full px-5 font-semibold">
-            <Link to="/rooms">Book a stay</Link>
+            <Link to="/login">Sign in</Link>
+          </Button>
+          <Button
+            asChild
+            className="rounded-full px-5 font-semibold bg-black text-white hover:bg-black/90"
+          >
+            <Link to="/signup">Sign up</Link>
           </Button>
         </div>
 
@@ -119,14 +113,17 @@ export function Navbar() {
                 </Link>
               ))}
               <Link
-                to={user ? "/admin" : "/login"}
+                to="/login"
                 className="px-4 py-3 rounded-xl text-sm font-medium hover:bg-white/5"
               >
-                {user ? "Admin panel" : "Sign in"}
+                Sign in
               </Link>
-              <Button asChild className="mt-2 rounded-full font-semibold">
-                <Link to="/rooms">Book a stay</Link>
-              </Button>
+              <Link
+                to="/signup"
+                className="px-4 py-3 rounded-xl text-sm font-medium hover:bg-white/5"
+              >
+                Sign up
+              </Link>
             </div>
           </motion.div>
         )}

@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+﻿import { createFileRoute } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { Eye, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
@@ -28,7 +28,7 @@ type AdminBooking = {
   created_at: string;
 };
 
-export const Route = createFileRoute("/_authenticated/admin/bookings")({
+export const Route = createFileRoute("/admin/bookings")({
   head: () => ({
     meta: [{ title: "Bookings Management — Admin Panel" }],
   }),
@@ -86,7 +86,8 @@ function AdminBookings() {
         <div className="mb-8 flex items-center justify-between gap-4">
           <h1 className="text-4xl font-bold text-black">Bookings Management</h1>
           <div className="text-sm text-gray-700">
-            Showing <span className="font-bold text-black">{filtered.length}</span> booking{filtered.length !== 1 ? "s" : ""}
+            Showing <span className="font-bold text-black">{filtered.length}</span> booking
+            {filtered.length !== 1 ? "s" : ""}
           </div>
         </div>
 
@@ -97,7 +98,9 @@ function AdminBookings() {
               onClick={() => setFilter(status)}
               type="button"
               className={`rounded px-4 py-2 font-bold capitalize transition ${
-                filter === status ? "bg-black text-white" : "bg-gray-200 text-black hover:bg-gray-300"
+                filter === status
+                  ? "bg-black text-white"
+                  : "bg-gray-200 text-black hover:bg-gray-300"
               }`}
             >
               {status}
@@ -105,7 +108,12 @@ function AdminBookings() {
           ))}
         </div>
 
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="overflow-x-auto">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="overflow-x-auto"
+        >
           <table className="w-full border-collapse">
             <thead>
               <tr className="border-b-2 border-black">
@@ -148,14 +156,20 @@ function AdminBookings() {
                     </td>
                     <td className="px-4 py-3 text-black">
                       <div>{new Date(b.check_in).toLocaleDateString()}</div>
-                      <div className="text-xs text-gray-700">→ {new Date(b.check_out).toLocaleDateString()}</div>
+                      <div className="text-xs text-gray-700">
+                        → {new Date(b.check_out).toLocaleDateString()}
+                      </div>
                     </td>
                     <td className="px-4 py-3 font-semibold text-black">
                       {"\u20B9"}
                       {(Number(b.total_cents) / 100).toLocaleString("en-IN")}
                     </td>
                     <td className="px-4 py-3">
-                      <span className={`rounded-full px-3 py-1 text-xs font-bold capitalize ${statusClass}`}>{b.status}</span>
+                      <span
+                        className={`rounded-full px-3 py-1 text-xs font-bold capitalize ${statusClass}`}
+                      >
+                        {b.status}
+                      </span>
                     </td>
                     <td className="flex gap-2 px-4 py-3">
                       <button
@@ -219,10 +233,13 @@ function AdminBookings() {
                   <div className="mt-1 font-semibold">{selected.room_type_name}</div>
                   <div className="text-sm text-gray-700">{selected.hotel_name}</div>
                   <div className="mt-2 text-sm text-black">
-                    {new Date(selected.check_in).toLocaleDateString()} → {new Date(selected.check_out).toLocaleDateString()} ({selected.nights} night{selected.nights !== 1 ? "s" : ""})
+                    {new Date(selected.check_in).toLocaleDateString()} →{" "}
+                    {new Date(selected.check_out).toLocaleDateString()} ({selected.nights} night
+                    {selected.nights !== 1 ? "s" : ""})
                   </div>
                   <div className="mt-2 text-sm text-black">
-                    Guests: {selected.adults} adult{selected.adults !== 1 ? "s" : ""}, {selected.children} child{selected.children !== 1 ? "ren" : ""}
+                    Guests: {selected.adults} adult{selected.adults !== 1 ? "s" : ""},{" "}
+                    {selected.children} child{selected.children !== 1 ? "ren" : ""}
                   </div>
                 </div>
               </div>
@@ -267,4 +284,3 @@ function AdminBookings() {
     </div>
   );
 }
-

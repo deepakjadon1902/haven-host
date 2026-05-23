@@ -6,7 +6,18 @@ import { z } from "zod";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import {
-  ArrowLeft, ArrowRight, Check, Mail, Phone, User, Car, Clock, PawPrint, Calendar, Plus, Minus,
+  ArrowLeft,
+  ArrowRight,
+  Check,
+  Mail,
+  Phone,
+  User,
+  Car,
+  Clock,
+  PawPrint,
+  Calendar,
+  Plus,
+  Minus,
 } from "lucide-react";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { Button } from "@/components/ui/button";
@@ -69,7 +80,9 @@ function BookingPage() {
   const [adultsCount, setAdultsCount] = useState(2);
   const [childrenCount, setChildrenCount] = useState(0);
   const [nights, setNights] = useState(2);
-  const [checkIn, setCheckIn] = useState<string>(search.date ?? new Date().toISOString().slice(0, 10));
+  const [checkIn, setCheckIn] = useState<string>(
+    search.date ?? new Date().toISOString().slice(0, 10),
+  );
   const [availability, setAvailability] = useState<RoomAvailabilityMap | null>(null);
   const [availabilityLoading, setAvailabilityLoading] = useState(false);
 
@@ -168,8 +181,7 @@ function BookingPage() {
     if (cur < adultsCount)
       for (let i = cur; i < adultsCount; i++)
         adultsArr.append({ name: "", age: 30, gender: "male" });
-    if (cur > adultsCount)
-      for (let i = cur - 1; i >= adultsCount; i--) adultsArr.remove(i);
+    if (cur > adultsCount) for (let i = cur - 1; i >= adultsCount; i--) adultsArr.remove(i);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [adultsCount]);
 
@@ -178,15 +190,21 @@ function BookingPage() {
     if (cur < childrenCount)
       for (let i = cur; i < childrenCount; i++)
         childrenArr.append({ name: "", age: 8, gender: "male" });
-    if (cur > childrenCount)
-      for (let i = cur - 1; i >= childrenCount; i--) childrenArr.remove(i);
+    if (cur > childrenCount) for (let i = cur - 1; i >= childrenCount; i--) childrenArr.remove(i);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [childrenCount]);
 
   const next = async () => {
     let valid = true;
     if (step === 0)
-      valid = await form.trigger(["fullName", "email", "phone", "transport", "arrivalTime", "pets"]);
+      valid = await form.trigger([
+        "fullName",
+        "email",
+        "phone",
+        "transport",
+        "arrivalTime",
+        "pets",
+      ]);
     if (step === 1) valid = await form.trigger(["adults", "children"]);
     if (!valid) {
       toast.error("Please complete the highlighted fields.");
@@ -284,15 +302,39 @@ function BookingPage() {
                   >
                     <Section title="Main details">
                       <Grid>
-                        <Field label="Full name" icon={<User />} error={form.formState.errors.fullName?.message}>
-                          <input className={inputCls} placeholder="Your full name" {...form.register("fullName")} />
+                        <Field
+                          label="Full name"
+                          icon={<User />}
+                          error={form.formState.errors.fullName?.message}
+                        >
+                          <input
+                            className={inputCls}
+                            placeholder="Your full name"
+                            {...form.register("fullName")}
+                          />
                         </Field>
-                        <Field label="Mobile number" icon={<Phone />} error={form.formState.errors.phone?.message}>
-                          <input className={inputCls} placeholder="+91 98765 43210" {...form.register("phone")} />
+                        <Field
+                          label="Mobile number"
+                          icon={<Phone />}
+                          error={form.formState.errors.phone?.message}
+                        >
+                          <input
+                            className={inputCls}
+                            placeholder="+91 98765 43210"
+                            {...form.register("phone")}
+                          />
                         </Field>
                       </Grid>
-                      <Field label="Email" icon={<Mail />} error={form.formState.errors.email?.message}>
-                        <input className={inputCls} placeholder="you@email.com" {...form.register("email")} />
+                      <Field
+                        label="Email"
+                        icon={<Mail />}
+                        error={form.formState.errors.email?.message}
+                      >
+                        <input
+                          className={inputCls}
+                          placeholder="you@email.com"
+                          {...form.register("email")}
+                        />
                       </Field>
                     </Section>
 
@@ -306,7 +348,11 @@ function BookingPage() {
                           </select>
                         </Field>
                         <Field label="Vehicle number (optional)" icon={<Car />}>
-                          <input className={inputCls} placeholder="MH 01 AB 1234" {...form.register("vehicleNumber")} />
+                          <input
+                            className={inputCls}
+                            placeholder="MH 01 AB 1234"
+                            {...form.register("vehicleNumber")}
+                          />
                         </Field>
                       </Grid>
                       <Grid>
@@ -318,8 +364,16 @@ function BookingPage() {
                             className={inputCls}
                           />
                         </Field>
-                        <Field label="Arrival time" icon={<Clock />} error={form.formState.errors.arrivalTime?.message}>
-                          <input type="time" className={inputCls} {...form.register("arrivalTime")} />
+                        <Field
+                          label="Arrival time"
+                          icon={<Clock />}
+                          error={form.formState.errors.arrivalTime?.message}
+                        >
+                          <input
+                            type="time"
+                            className={inputCls}
+                            {...form.register("arrivalTime")}
+                          />
                         </Field>
                         <Field label="Nights" icon={<Calendar />}>
                           <Counter value={nights} setValue={setNights} min={1} max={30} />
@@ -330,10 +384,20 @@ function BookingPage() {
                     <Section title="Guest summary">
                       <Grid>
                         <Field label={`Adults (max ${maxAdults})`} icon={<User />}>
-                          <Counter value={adultsCount} setValue={setAdultsCount} min={1} max={maxAdults} />
+                          <Counter
+                            value={adultsCount}
+                            setValue={setAdultsCount}
+                            min={1}
+                            max={maxAdults}
+                          />
                         </Field>
                         <Field label={`Children (max ${maxChildren})`} icon={<User />}>
-                          <Counter value={childrenCount} setValue={setChildrenCount} min={0} max={maxChildren} />
+                          <Counter
+                            value={childrenCount}
+                            setValue={setChildrenCount}
+                            min={0}
+                            max={maxChildren}
+                          />
                         </Field>
                       </Grid>
                       <Field label="Travelling with a pet?" icon={<PawPrint />}>
@@ -393,7 +457,9 @@ function BookingPage() {
                           <span
                             key={p}
                             className={`px-4 h-10 rounded-full border text-sm font-semibold inline-flex items-center ${
-                              i === 0 ? "bg-gold text-black border-gold" : "border-black/15 text-black/70"
+                              i === 0
+                                ? "bg-gold text-black border-gold"
+                                : "border-black/15 text-black/70"
                             }`}
                           >
                             {p}
@@ -401,17 +467,36 @@ function BookingPage() {
                         ))}
                       </div>
                       <Field label="Name on card" error={form.formState.errors.cardName?.message}>
-                        <input className={inputCls} placeholder="As printed on card" {...form.register("cardName")} />
+                        <input
+                          className={inputCls}
+                          placeholder="As printed on card"
+                          {...form.register("cardName")}
+                        />
                       </Field>
                       <Field label="Card number" error={form.formState.errors.cardNumber?.message}>
-                        <input className={inputCls} placeholder="4242 4242 4242 4242" {...form.register("cardNumber")} />
+                        <input
+                          className={inputCls}
+                          placeholder="4242 4242 4242 4242"
+                          {...form.register("cardNumber")}
+                        />
                       </Field>
                       <Grid>
-                        <Field label="Expiry (MM/YY)" error={form.formState.errors.cardExpiry?.message}>
-                          <input className={inputCls} placeholder="08/28" {...form.register("cardExpiry")} />
+                        <Field
+                          label="Expiry (MM/YY)"
+                          error={form.formState.errors.cardExpiry?.message}
+                        >
+                          <input
+                            className={inputCls}
+                            placeholder="08/28"
+                            {...form.register("cardExpiry")}
+                          />
                         </Field>
                         <Field label="CVC" error={form.formState.errors.cardCvc?.message}>
-                          <input className={inputCls} placeholder="123" {...form.register("cardCvc")} />
+                          <input
+                            className={inputCls}
+                            placeholder="123"
+                            {...form.register("cardCvc")}
+                          />
                         </Field>
                       </Grid>
                       <p className="text-xs text-gray-700">
@@ -433,7 +518,11 @@ function BookingPage() {
                   <ArrowLeft className="h-4 w-4" /> Back
                 </Button>
                 {step < steps.length - 1 ? (
-                  <Button type="button" onClick={next} className="rounded-full font-semibold px-6 h-11">
+                  <Button
+                    type="button"
+                    onClick={next}
+                    className="rounded-full font-semibold px-6 h-11"
+                  >
                     Continue <ArrowRight className="h-4 w-4" />
                   </Button>
                 ) : (
@@ -454,22 +543,40 @@ function BookingPage() {
             <div className="rounded-3xl border border-black/10 overflow-hidden bg-white">
               <img src={roomType.coverImage} alt="" className="aspect-[4/3] w-full object-cover" />
               <div className="p-6">
-                <p className="text-xs uppercase tracking-widest text-gold font-semibold">Maison Noir</p>
-                <h3 className="mt-1 font-display text-xl font-semibold text-black">Reservation summary</h3>
+                <p className="text-xs uppercase tracking-widest text-gold font-semibold">
+                  Maison Noir
+                </p>
+                <h3 className="mt-1 font-display text-xl font-semibold text-black">
+                  Reservation summary
+                </h3>
                 <p className="mt-1 text-sm text-gray-700">{roomType.name}</p>
                 <div className="mt-4 text-sm text-gray-700 space-y-1">
-                  <p><span className="text-gray-700/70">Check-in</span> · {checkIn}</p>
-                  <p><span className="text-gray-700/70">Check-out</span> · {checkOut}</p>
-                  <p><span className="text-gray-700/70">Nights</span> · {nights}</p>
-                  <p><span className="text-gray-700/70">Guests</span> · {adultsCount} adults{childrenCount ? `, ${childrenCount} children` : ""}</p>
+                  <p>
+                    <span className="text-gray-700/70">Check-in</span> · {checkIn}
+                  </p>
+                  <p>
+                    <span className="text-gray-700/70">Check-out</span> · {checkOut}
+                  </p>
+                  <p>
+                    <span className="text-gray-700/70">Nights</span> · {nights}
+                  </p>
+                  <p>
+                    <span className="text-gray-700/70">Guests</span> · {adultsCount} adults
+                    {childrenCount ? `, ${childrenCount} children` : ""}
+                  </p>
                 </div>
                 <div className="mt-5 border-t border-black/10 pt-5 space-y-2 text-sm text-black">
-                  <Row label={`₹${roomType.pricePerNight.toLocaleString("en-IN")} × ${nights} nights`} value={`₹${subtotal.toLocaleString("en-IN")}`} />
+                  <Row
+                    label={`₹${roomType.pricePerNight.toLocaleString("en-IN")} × ${nights} nights`}
+                    value={`₹${subtotal.toLocaleString("en-IN")}`}
+                  />
                   <Row label="Taxes & fees" value={`₹${taxes.toLocaleString("en-IN")}`} />
                 </div>
                 <div className="mt-4 border-t border-black/10 pt-4 flex items-baseline justify-between text-black">
                   <span className="font-semibold">Total</span>
-                  <span className="font-display text-2xl gold-text font-semibold">₹{total.toLocaleString("en-IN")}</span>
+                  <span className="font-display text-2xl gold-text font-semibold">
+                    ₹{total.toLocaleString("en-IN")}
+                  </span>
                 </div>
               </div>
             </div>
@@ -499,8 +606,12 @@ function Stepper({ step }: { step: number }) {
           >
             {i < step ? <Check className="h-4 w-4" /> : i + 1}
           </div>
-          <span className={`text-sm font-medium ${i <= step ? "text-black" : "text-black/50"}`}>{s}</span>
-          {i < steps.length - 1 && <div className={`h-px flex-1 ${i < step ? "bg-gold" : "bg-black/10"}`} />}
+          <span className={`text-sm font-medium ${i <= step ? "text-black" : "text-black/50"}`}>
+            {s}
+          </span>
+          {i < steps.length - 1 && (
+            <div className={`h-px flex-1 ${i < step ? "bg-gold" : "bg-black/10"}`} />
+          )}
         </div>
       ))}
     </div>

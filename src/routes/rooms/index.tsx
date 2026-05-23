@@ -17,7 +17,10 @@ export const Route = createFileRoute("/rooms/")({
   head: () => ({
     meta: [
       { title: "Rooms â€” Maison Noir" },
-      { name: "description", content: "Explore our rooms with live availability and transparent pricing." },
+      {
+        name: "description",
+        content: "Explore our rooms with live availability and transparent pricing.",
+      },
     ],
   }),
   component: RoomsPage,
@@ -57,13 +60,18 @@ function RoomsPage() {
   return (
     <SiteLayout>
       <div className="mx-auto max-w-7xl px-5 py-10 lg:px-8 lg:py-14">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-10">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-10"
+        >
           <p className="text-xs font-semibold uppercase tracking-[0.25em] text-gold">Maison Noir</p>
           <h1 className="mt-2 text-4xl font-display font-semibold text-black md:text-5xl">
             Rooms for a <span className="gold-text italic">royal stay.</span>
           </h1>
           <p className="mt-4 max-w-2xl text-sm text-gray-700">
-            A single hotel, run by one owner â€” manage inventory in the admin panel and book with live availability.
+            A single hotel, run by one owner â€” manage inventory in the admin panel and book with
+            live availability.
           </p>
         </motion.div>
 
@@ -102,7 +110,11 @@ function RoomsPage() {
         ) : (
           <div className="py-20 text-center text-gray-700">
             <p className="text-lg">No rooms found.</p>
-            <Button asChild variant="outline" className="mt-6 rounded-full border-black/15 text-black hover:bg-gray-50">
+            <Button
+              asChild
+              variant="outline"
+              className="mt-6 rounded-full border-black/15 text-black hover:bg-gray-50"
+            >
               <Link to="/">Back home</Link>
             </Button>
           </div>
@@ -111,4 +123,3 @@ function RoomsPage() {
     </SiteLayout>
   );
 }
-

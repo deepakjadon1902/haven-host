@@ -54,7 +54,9 @@ function SuccessPage() {
           transition={{ delay: 0.4 }}
           className="mt-6 inline-flex items-center gap-2 rounded-full border border-gold/40 bg-white px-5 py-2.5"
         >
-          <span className="text-xs font-semibold uppercase tracking-widest text-gray-700">Reference</span>
+          <span className="text-xs font-semibold uppercase tracking-widest text-gray-700">
+            Reference
+          </span>
           <span className="font-semibold gold-text">{ref ?? "MN-XXXXXX"}</span>
         </motion.div>
 
@@ -62,7 +64,11 @@ function SuccessPage() {
           <Button asChild className="h-11 rounded-full px-6 font-semibold">
             <Link to="/my-bookings">View my bookings</Link>
           </Button>
-          <Button asChild variant="outline" className="h-11 rounded-full px-6 font-semibold border-black/15 text-black hover:bg-gray-50">
+          <Button
+            asChild
+            variant="outline"
+            className="h-11 rounded-full px-6 font-semibold border-black/15 text-black hover:bg-gray-50"
+          >
             <Link to="/">
               <Home className="h-4 w-4" /> Back home
             </Link>

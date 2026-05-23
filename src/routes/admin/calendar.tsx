@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+﻿import { createFileRoute } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import type { Room } from "@/types/room";
 import { adminListInventory, adminListRooms, adminSetInventory } from "@/lib/admin.functions";
 
-export const Route = createFileRoute("/_authenticated/admin/calendar")({
+export const Route = createFileRoute("/admin/calendar")({
   head: () => ({
     meta: [{ title: "Inventory Calendar — Admin Panel" }],
   }),
@@ -14,7 +14,13 @@ export const Route = createFileRoute("/_authenticated/admin/calendar")({
 });
 
 type InventoryOverride = { date: string; status: "closed" | "maintenance"; note: string | null };
-type BookingLite = { check_in: string; check_out: string; reference: string; guest_full_name: string; status: string };
+type BookingLite = {
+  check_in: string;
+  check_out: string;
+  reference: string;
+  guest_full_name: string;
+  status: string;
+};
 
 function isoDate(d: Date) {
   return new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())).toISOString().slice(0, 10);
@@ -81,7 +87,11 @@ function AdminCalendar() {
     const fetchInventory = async () => {
       setInventoryLoading(true);
       try {
-        const data = await adminListInventory({ roomId: selectedRoomId, from: range.from, to: range.to });
+        const data = await adminListInventory({
+          roomId: selectedRoomId,
+          from: range.from,
+          to: range.to,
+        });
         setInventoryOverrides((data.inventory ?? []) as InventoryOverride[]);
         setBookings((data.bookings ?? []) as BookingLite[]);
         setRoomMeta(data.room ?? null);
@@ -163,7 +173,11 @@ function AdminCalendar() {
         note: editNote.trim() ? editNote.trim() : undefined,
       });
 
-      const data = await adminListInventory({ roomId: selectedRoomId, from: range.from, to: range.to });
+      const data = await adminListInventory({
+        roomId: selectedRoomId,
+        from: range.from,
+        to: range.to,
+      });
       setInventoryOverrides((data.inventory ?? []) as InventoryOverride[]);
       setBookings((data.bookings ?? []) as BookingLite[]);
       setRoomMeta(data.room ?? null);
@@ -202,18 +216,29 @@ function AdminCalendar() {
           )}
           {roomMeta && (
             <div className="mt-2 text-sm text-gray-700">
-              <span className="font-semibold text-black">{roomMeta.name}</span> • {roomMeta.total_units} unit{roomMeta.total_units !== 1 ? "s" : ""}
+              <span className="font-semibold text-black">{roomMeta.name}</span> •{" "}
+              {roomMeta.total_units} unit{roomMeta.total_units !== 1 ? "s" : ""}
             </div>
           )}
         </div>
 
         {/* Calendar */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="rounded-lg border-2 border-black bg-white p-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="rounded-lg border-2 border-black bg-white p-6"
+        >
           <div className="mb-6 flex items-center justify-between">
             <h2 className="text-2xl font-bold text-black">{monthName}</h2>
             <div className="flex gap-2">
               <button
-                onClick={() => setCurrentMonth(startOfMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1)))}
+                onClick={() =>
+                  setCurrentMonth(
+                    startOfMonth(
+                      new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1),
+                    ),
+                  )
+                }
                 className="rounded border-2 border-black p-2 hover:bg-gray-100"
                 type="button"
                 aria-label="Previous month"
@@ -221,7 +246,13 @@ function AdminCalendar() {
                 <ChevronLeft size={20} className="text-black" />
               </button>
               <button
-                onClick={() => setCurrentMonth(startOfMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1)))}
+                onClick={() =>
+                  setCurrentMonth(
+                    startOfMonth(
+                      new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1),
+                    ),
+                  )
+                }
                 className="rounded border-2 border-black p-2 hover:bg-gray-100"
                 type="button"
                 aria-label="Next month"
@@ -251,11 +282,7 @@ function AdminCalendar() {
                   const bookedCount = bookingsCountByDate.get(item.dateIso) ?? 0;
                   const fullyBooked = totalUnits > 0 && bookedCount >= totalUnits;
 
-                  const state = override
-                    ? override.status
-                    : fullyBooked
-                      ? "booked"
-                      : "open";
+                  const state = override ? override.status : fullyBooked ? "booked" : "open";
 
                   const dotClass =
                     state === "open"
@@ -295,7 +322,9 @@ function AdminCalendar() {
                       <div className="absolute bottom-1 left-1/2 flex -translate-x-1/2 items-center gap-1">
                         <div className={`h-2 w-2 rounded-full ${dotClass}`} />
                         {state === "open" && totalUnits > 0 && (
-                          <span className="text-[10px] font-bold text-black/80">{Math.max(0, totalUnits - bookedCount)}</span>
+                          <span className="text-[10px] font-bold text-black/80">
+                            {Math.max(0, totalUnits - bookedCount)}
+                          </span>
                         )}
                       </div>
                     </button>
@@ -412,7 +441,12 @@ function AdminCalendar() {
           </motion.div>
         )}
 
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="mt-8 rounded-lg border-2 border-black bg-gray-50 p-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="mt-8 rounded-lg border-2 border-black bg-gray-50 p-6"
+        >
           <h3 className="mb-3 text-lg font-bold text-black">Notes</h3>
           <ul className="list-disc space-y-2 pl-5 text-black">
             <li>Yellow “fully booked” days are derived from bookings and are read-only.</li>
@@ -424,4 +458,3 @@ function AdminCalendar() {
     </div>
   );
 }
-

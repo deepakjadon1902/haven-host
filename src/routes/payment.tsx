@@ -5,7 +5,12 @@ import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { Button } from "@/components/ui/button";
-import { clearPaymentDraft, createBooking, readPaymentDraft, type PaymentDraft } from "@/lib/local-store";
+import {
+  clearPaymentDraft,
+  createBooking,
+  readPaymentDraft,
+  type PaymentDraft,
+} from "@/lib/local-store";
 import { getPublicRoomById } from "@/lib/rooms.functions";
 import type { Room } from "@/types/room";
 
@@ -106,12 +111,18 @@ function PaymentPage() {
         </motion.div>
 
         <div className="mt-8 grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
-          <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} className="rounded-3xl border border-black/10 bg-white p-8">
+          <motion.div
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="rounded-3xl border border-black/10 bg-white p-8"
+          >
             <h2 className="font-display text-xl font-semibold text-black">Order summary</h2>
             <div className="mt-4 space-y-2 text-sm text-gray-700">
               <div className="flex justify-between gap-4">
                 <span>Room</span>
-                <span className="font-semibold text-black">{room?.name ?? draft.room_type_name}</span>
+                <span className="font-semibold text-black">
+                  {room?.name ?? draft.room_type_name}
+                </span>
               </div>
               <div className="flex justify-between gap-4">
                 <span>Dates</span>
@@ -131,7 +142,12 @@ function PaymentPage() {
             </div>
           </motion.div>
 
-          <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} className="rounded-3xl border border-black/10 bg-white p-8">
+          <motion.div
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.05 }}
+            className="rounded-3xl border border-black/10 bg-white p-8"
+          >
             <h2 className="font-display text-xl font-semibold text-black">Pay securely</h2>
             <div className="mt-4 space-y-3 text-sm text-gray-700">
               <div className="flex items-center gap-2">
@@ -142,11 +158,19 @@ function PaymentPage() {
               </div>
             </div>
 
-            <Button onClick={pay} disabled={paying} className="mt-6 h-12 w-full rounded-xl font-semibold">
+            <Button
+              onClick={pay}
+              disabled={paying}
+              className="mt-6 h-12 w-full rounded-xl font-semibold"
+            >
               {paying ? "Processing..." : `Pay ${formatInr(draft.total_cents)}`}
             </Button>
 
-            <Button onClick={fail} variant="outline" className="mt-3 h-12 w-full rounded-xl font-semibold border-black/15 text-black hover:bg-gray-50">
+            <Button
+              onClick={fail}
+              variant="outline"
+              className="mt-3 h-12 w-full rounded-xl font-semibold border-black/15 text-black hover:bg-gray-50"
+            >
               <XCircle className="h-4 w-4" /> Simulate failure
             </Button>
 
@@ -161,4 +185,3 @@ function PaymentPage() {
     </SiteLayout>
   );
 }
-

@@ -8,4 +8,3 @@ export const Route = createFileRoute("/rooms")({
 function RoomsLayout() {
   return <Outlet />;
 }
-

@@ -89,8 +89,11 @@ function seedRooms(): Room[] {
       size: "55 sqm",
       bedType: "King Bed",
       amenities: ["WiFi", "AC", "Hot Water", "Courtyard View", "Tea & Coffee"],
-      images: ["https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=80"],
-      coverImage: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=80",
+      images: [
+        "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=80",
+      ],
+      coverImage:
+        "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=80",
       totalUnits: 4,
       active: true,
       sortOrder: 4,
@@ -108,8 +111,11 @@ function seedRooms(): Room[] {
       size: "68 sqm",
       bedType: "King Bed",
       amenities: ["WiFi", "AC", "Hot Water", "Lounge", "City View", "Mini Bar"],
-      images: ["https://images.unsplash.com/photo-1540518614846-7eded433c457?auto=format&fit=crop&w=1200&q=80"],
-      coverImage: "https://images.unsplash.com/photo-1540518614846-7eded433c457?auto=format&fit=crop&w=1200&q=80",
+      images: [
+        "https://images.unsplash.com/photo-1540518614846-7eded433c457?auto=format&fit=crop&w=1200&q=80",
+      ],
+      coverImage:
+        "https://images.unsplash.com/photo-1540518614846-7eded433c457?auto=format&fit=crop&w=1200&q=80",
       totalUnits: 2,
       active: true,
       sortOrder: 5,
@@ -141,7 +147,8 @@ export function ensureSeeded() {
       country: "India",
       address: "Boutique property â€” address configurable in Admin > Settings",
       description: MAIN_HOTEL.description,
-      heroImage: "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=1600&q=80",
+      heroImage:
+        "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=1600&q=80",
       contactEmail: "contact@maisonnoir.example",
       contactPhone: "+91 90000 00000",
     };
@@ -169,7 +176,11 @@ export function upsertRoom(room: Room): Room {
   const rooms = listRooms();
   const nextRoom: Room = normalizeRoom({
     ...room,
-    id: room.id || (typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : `room-${Date.now()}`),
+    id:
+      room.id ||
+      (typeof crypto !== "undefined" && "randomUUID" in crypto
+        ? crypto.randomUUID()
+        : `room-${Date.now()}`),
   });
 
   const existingIdx = rooms.findIndex((r) => r.id === nextRoom.id);
@@ -197,7 +208,8 @@ export function getSettings(): HotelSettings {
     country: "India",
     address: "Boutique property â€” address configurable in Admin > Settings",
     description: MAIN_HOTEL.description,
-    heroImage: "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=1600&q=80",
+    heroImage:
+      "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=1600&q=80",
     contactEmail: "contact@maisonnoir.example",
     contactPhone: "+91 90000 00000",
   };
@@ -218,7 +230,11 @@ function writeInventoryRows(rows: InventoryRow[]) {
   writeJson(INVENTORY_KEY, rows);
 }
 
-export function getRoomAvailability(roomId: string, from: string, days: number): RoomAvailabilityMap {
+export function getRoomAvailability(
+  roomId: string,
+  from: string,
+  days: number,
+): RoomAvailabilityMap {
   const room = getRoomById(roomId);
   const totalUnits = room?.totalUnits ?? 1;
   const to = addDays(from, days);
@@ -284,10 +300,18 @@ function writeBookings(rows: LocalBooking[]) {
   writeJson(BOOKINGS_KEY, rows);
 }
 
-export function createBooking(input: Omit<LocalBooking, "id" | "created_at" | "status" | "reference"> & { status?: BookingStatus; reference?: string }): LocalBooking {
+export function createBooking(
+  input: Omit<LocalBooking, "id" | "created_at" | "status" | "reference"> & {
+    status?: BookingStatus;
+    reference?: string;
+  },
+): LocalBooking {
   ensureSeeded();
   const now = new Date().toISOString();
-  const id = typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : `bk-${Date.now()}`;
+  const id =
+    typeof crypto !== "undefined" && "randomUUID" in crypto
+      ? crypto.randomUUID()
+      : `bk-${Date.now()}`;
   const reference =
     input.reference ??
     `MN-${Math.random().toString(16).slice(2, 6).toUpperCase()}${Math.random().toString(16).slice(2, 6).toUpperCase()}`;
@@ -309,27 +333,49 @@ export function createBooking(input: Omit<LocalBooking, "id" | "created_at" | "s
 
 export function cancelBooking(id: string) {
   if (!isBrowser()) return;
-  const next = listBookings().map((b) => (b.id === id ? { ...b, status: "cancelled" as const } : b));
+  const next = listBookings().map((b) =>
+    b.id === id ? { ...b, status: "cancelled" as const } : b,
+  );
   writeBookings(next);
 }
 
-export function setInventory(input: { roomId: string; date: string; status: "open" | "closed" | "maintenance"; note?: string }) {
+export function setInventory(input: {
+  roomId: string;
+  date: string;
+  status: "open" | "closed" | "maintenance";
+  note?: string;
+}) {
   if (!isBrowser()) return;
   const rows = listInventoryRows();
   const next = rows.filter((r) => !(r.room_id === input.roomId && r.date === input.date));
   if (input.status !== "open") {
-    next.push({ room_id: input.roomId, date: input.date, status: input.status, note: input.note ?? null });
+    next.push({
+      room_id: input.roomId,
+      date: input.date,
+      status: input.status,
+      note: input.note ?? null,
+    });
   }
   writeInventoryRows(next);
 }
 
 export function getInventoryAndBookings(input: { roomId: string; from: string; to: string }) {
   const inventory = isBrowser()
-    ? listInventoryRows().filter((r) => r.room_id === input.roomId && r.date >= input.from && r.date <= input.to)
+    ? listInventoryRows().filter(
+        (r) => r.room_id === input.roomId && r.date >= input.from && r.date <= input.to,
+      )
     : [];
-  const bookings = listBookings().filter((b) => b.room_id === input.roomId && b.status !== "cancelled");
+  const bookings = listBookings().filter(
+    (b) => b.room_id === input.roomId && b.status !== "cancelled",
+  );
   const room = getRoomById(input.roomId);
-  return { inventory, bookings, room: room ? { total_units: room.totalUnits, name: room.name } : { total_units: 1, name: "Room" } };
+  return {
+    inventory,
+    bookings,
+    room: room
+      ? { total_units: room.totalUnits, name: room.name }
+      : { total_units: 1, name: "Room" },
+  };
 }
 
 export type PaymentDraft = {

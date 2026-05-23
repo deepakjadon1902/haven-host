@@ -25,7 +25,8 @@ export const MAIN_HOTEL: Hotel = {
   slug: "maison-noir",
   name: "Maison Noir",
   tagline: "Curated luxury hospitality",
-  description: "A private collection of exquisitely designed rooms across India, Morocco, Japan and Italy.",
+  description:
+    "A private collection of exquisitely designed rooms across India, Morocco, Japan and Italy.",
 };
 
 /**
@@ -51,8 +52,11 @@ export const mockRooms: Room[] = [
     size: "45 sqm",
     bedType: "King Bed",
     amenities: ["WiFi", "AC", "Hot Water", "Mini Bar", "Work Desk"],
-    images: ["https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&w=800"],
-    coverImage: "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&w=800",
+    images: [
+      "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&w=800",
+    ],
+    coverImage:
+      "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&w=800",
     totalUnits: 5,
     active: true,
     sortOrder: 1,
@@ -70,8 +74,11 @@ export const mockRooms: Room[] = [
     size: "40 sqm",
     bedType: "Queen Bed",
     amenities: ["WiFi", "AC", "Hot Water", "Garden Access"],
-    images: ["https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800"],
-    coverImage: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800",
+    images: [
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800",
+    ],
+    coverImage:
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800",
     totalUnits: 3,
     active: true,
     sortOrder: 2,
@@ -89,8 +96,11 @@ export const mockRooms: Room[] = [
     size: "60 sqm",
     bedType: "King + Twin Bed",
     amenities: ["WiFi", "AC", "Hot Water", "Spa Bath", "Lounge Area"],
-    images: ["https://images.unsplash.com/photo-1564078369132-521ba4e44af3?auto=format&fit=crop&w=800"],
-    coverImage: "https://images.unsplash.com/photo-1564078369132-521ba4e44af3?auto=format&fit=crop&w=800",
+    images: [
+      "https://images.unsplash.com/photo-1564078369132-521ba4e44af3?auto=format&fit=crop&w=800",
+    ],
+    coverImage:
+      "https://images.unsplash.com/photo-1564078369132-521ba4e44af3?auto=format&fit=crop&w=800",
     totalUnits: 2,
     active: true,
     sortOrder: 3,

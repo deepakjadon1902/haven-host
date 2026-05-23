@@ -7,8 +7,20 @@ export const Route = createFileRoute("/sitemap.xml")({
       GET: async () => {
         const data = listRooms({ activeOnly: true }).map((r) => ({ slug: r.slug }));
         const staticPaths = [
-          "/", "/rooms", "/offers", "/about", "/contact", "/gallery",
-          "/blogs", "/faq", "/testimonials", "/terms", "/privacy", "/refund",
+          "/",
+          "/rooms",
+          "/offers",
+          "/gallery",
+          "/journal",
+          "/company",
+          "/about",
+          "/contact",
+          "/faq",
+          "/testimonials",
+          "/legal",
+          "/terms",
+          "/privacy",
+          "/refund-policy",
         ];
         const urls = [
           ...staticPaths.map((p) => `  <url><loc>${p}</loc></url>`),

@@ -1,4 +1,3 @@
-
 ## Scope (one big pass)
 
 Three things in one go: (1) rebrand hotels → rooms for a single property "MaisonNoir", (2) flip the entire UI from black-on-gold to white-on-black-on-white (pure white bg / pure black text, gold accent kept), (3) ship a fully functional admin panel for `deepakjadon1907@gmail.com`.
@@ -6,6 +5,7 @@ Three things in one go: (1) rebrand hotels → rooms for a single property "Mais
 ## Database
 
 New migration:
+
 - `hotel_settings` — single-row table for MaisonNoir's name, tagline, city, address, hero image, contact info. Public read.
 - `rooms` — room types (slug, name, description, price_cents, max_adults/children, pets_allowed, size, bed_type, amenities[], images[], cover_image, total_units, active). Public read of active rows; admin-only write.
 - `room_inventory` — per `(room_id, date)` block with status `closed | maintenance`. Public read; admin-only write. Booked dates are derived from `bookings`.

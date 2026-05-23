@@ -1,12 +1,20 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { useRouter } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { getLocalUser, signInWithPassword as localSignInWithPassword, signOut as localSignOut, type LocalUser } from "@/lib/local-auth";
+import {
+  getLocalUser,
+  signInWithPassword as localSignInWithPassword,
+  signOut as localSignOut,
+  type LocalUser,
+} from "@/lib/local-auth";
 
 type AuthContextValue = {
   user: LocalUser | null;
   loading: boolean;
-  signInWithPassword: (input: { email: string; password: string }) => Promise<{ user: LocalUser | null; error: string | null }>;
+  signInWithPassword: (input: {
+    email: string;
+    password: string;
+  }) => Promise<{ user: LocalUser | null; error: string | null }>;
   signOut: () => Promise<void>;
 };
 

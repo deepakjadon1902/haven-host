@@ -1,13 +1,18 @@
-import { createFileRoute } from "@tanstack/react-router";
+﻿import { createFileRoute } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { Edit2, Eye, EyeOff, Plus, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import type { Room } from "@/types/room";
 import { Button } from "@/components/ui/button";
-import { adminCreateRoom, adminDeleteRoom, adminListRooms, adminUpdateRoom } from "@/lib/admin.functions";
+import {
+  adminCreateRoom,
+  adminDeleteRoom,
+  adminListRooms,
+  adminUpdateRoom,
+} from "@/lib/admin.functions";
 
-export const Route = createFileRoute("/_authenticated/admin/rooms")({
+export const Route = createFileRoute("/admin/rooms")({
   head: () => ({
     meta: [{ title: "Rooms Management — Admin Panel" }],
   }),
@@ -82,7 +87,10 @@ function AdminRooms() {
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
         <div className="mb-8 flex items-center justify-between gap-4">
           <h1 className="text-4xl font-bold text-black">Rooms Management</h1>
-          <Button onClick={() => setFormState({ mode: "create" })} className="flex items-center gap-2 bg-black text-white hover:bg-gray-800">
+          <Button
+            onClick={() => setFormState({ mode: "create" })}
+            className="flex items-center gap-2 bg-black text-white hover:bg-gray-800"
+          >
             <Plus size={20} />
             Add New Room
           </Button>
@@ -96,7 +104,9 @@ function AdminRooms() {
           >
             <div className="mb-4 flex items-start justify-between gap-4">
               <h2 className="text-2xl font-bold text-black">
-                {formState.mode === "create" ? "Create New Room" : `Edit Room: ${formState.room.name}`}
+                {formState.mode === "create"
+                  ? "Create New Room"
+                  : `Edit Room: ${formState.room.name}`}
               </h2>
               <button
                 type="button"
@@ -120,7 +130,12 @@ function AdminRooms() {
           </motion.div>
         )}
 
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="overflow-x-auto">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="overflow-x-auto"
+        >
           <table className="w-full border-collapse">
             <thead>
               <tr className="border-b-2 border-black">
@@ -194,7 +209,10 @@ function AdminRooms() {
         {rooms.length === 0 && (
           <div className="py-16 text-center text-gray-700">
             <p className="mb-4 text-lg">No rooms found</p>
-            <Button onClick={() => setFormState({ mode: "create" })} className="bg-black text-white hover:bg-gray-800">
+            <Button
+              onClick={() => setFormState({ mode: "create" })}
+              className="bg-black text-white hover:bg-gray-800"
+            >
               Create First Room
             </Button>
           </div>
@@ -400,7 +418,9 @@ function RoomForm({
           />
         </div>
         <div>
-          <label className="mb-2 block text-sm font-bold text-black">Images (comma-separated URLs)</label>
+          <label className="mb-2 block text-sm font-bold text-black">
+            Images (comma-separated URLs)
+          </label>
           <input
             type="text"
             value={images}
@@ -412,7 +432,9 @@ function RoomForm({
       </div>
 
       <div>
-        <label className="mb-2 block text-sm font-bold text-black">Amenities (comma-separated)</label>
+        <label className="mb-2 block text-sm font-bold text-black">
+          Amenities (comma-separated)
+        </label>
         <input
           type="text"
           value={amenities}
@@ -466,11 +488,14 @@ function RoomForm({
         >
           {isSubmitting ? "Saving..." : mode === "create" ? "Create Room" : "Save Changes"}
         </button>
-        <button type="button" onClick={onCancel} className="rounded bg-gray-200 px-6 py-2 font-bold text-black hover:bg-gray-300">
+        <button
+          type="button"
+          onClick={onCancel}
+          className="rounded bg-gray-200 px-6 py-2 font-bold text-black hover:bg-gray-300"
+        >
           Cancel
         </button>
       </div>
     </form>
   );
 }
-

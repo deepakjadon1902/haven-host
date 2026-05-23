@@ -43,6 +43,9 @@ function RoomDetailPage() {
   const [availability, setAvailability] = useState<RoomAvailabilityMap | null>(null);
   const [availabilityLoading, setAvailabilityLoading] = useState(false);
 
+  const isNotFoundError = (err: unknown): err is { isNotFound: true } =>
+    !!err && typeof err === "object" && "isNotFound" in err;
+
   useEffect(() => {
     const load = async () => {
       setLoading(true);
@@ -51,7 +54,7 @@ function RoomDetailPage() {
         if (!r) throw notFound();
         setRoom(r);
       } catch (error) {
-        if (error && typeof error === "object" && "isNotFound" in (error as any)) throw error;
+        if (isNotFoundError(error)) throw error;
         toast.error(error instanceof Error ? error.message : "Failed to load room");
       } finally {
         setLoading(false);
@@ -98,7 +101,10 @@ function RoomDetailPage() {
     <SiteLayout>
       <div className="mx-auto max-w-7xl px-5 py-10 lg:px-8 lg:py-14">
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-          <Link to="/rooms" className="inline-flex items-center gap-2 text-sm text-gray-700 hover:text-black">
+          <Link
+            to="/rooms"
+            className="inline-flex items-center gap-2 text-sm text-gray-700 hover:text-black"
+          >
             <ArrowLeft className="h-4 w-4" />
             Back to rooms
           </Link>
@@ -115,8 +121,15 @@ function RoomDetailPage() {
             {room.images.length > 1 ? (
               <div className="mb-8 grid grid-cols-3 gap-4">
                 {room.images.slice(0, 3).map((img, i) => (
-                  <div key={i} className="aspect-square overflow-hidden rounded-xl border border-black/10 bg-gray-50">
-                    <img src={img} alt={`${room.name} ${i + 1}`} className="h-full w-full object-cover" />
+                  <div
+                    key={i}
+                    className="aspect-square overflow-hidden rounded-xl border border-black/10 bg-gray-50"
+                  >
+                    <img
+                      src={img}
+                      alt={`${room.name} ${i + 1}`}
+                      className="h-full w-full object-cover"
+                    />
                   </div>
                 ))}
               </div>
@@ -124,7 +137,9 @@ function RoomDetailPage() {
 
             <div className="space-y-6">
               <div>
-                <h1 className="font-display text-4xl font-semibold text-black md:text-5xl">{room.name}</h1>
+                <h1 className="font-display text-4xl font-semibold text-black md:text-5xl">
+                  {room.name}
+                </h1>
                 <p className="mt-3 text-sm text-gray-700">{room.description}</p>
               </div>
 
@@ -182,7 +197,9 @@ function RoomDetailPage() {
           >
             <div className="rounded-3xl border border-black/10 bg-white p-8">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-widest text-gray-700">Per night</p>
+                <p className="text-xs font-semibold uppercase tracking-widest text-gray-700">
+                  Per night
+                </p>
                 <p className="mt-2 font-display text-4xl font-semibold text-black">
                   {"\u20B9"}
                   {room.pricePerNight.toLocaleString("en-IN")}
@@ -205,7 +222,13 @@ function RoomDetailPage() {
                           : state === "booked"
                             ? "bg-yellow-500"
                             : "bg-red-600";
-                      return <div key={d} title={`${d} — ${state}`} className={`h-2 rounded-full ${cls}`} />;
+                      return (
+                        <div
+                          key={d}
+                          title={`${d} — ${state}`}
+                          className={`h-2 rounded-full ${cls}`}
+                        />
+                      );
                     })}
                   </div>
                 ) : (
@@ -225,10 +248,7 @@ function RoomDetailPage() {
               </div>
 
               <Button asChild size="lg" className="mt-6 h-12 w-full rounded-xl font-semibold">
-                <Link
-                  to="/booking"
-                  search={{ room: room.id, date: todayIso() } as never}
-                >
+                <Link to="/booking" search={{ room: room.id, date: todayIso() } as never}>
                   Book Now <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
@@ -245,4 +265,3 @@ function RoomDetailPage() {
     </SiteLayout>
   );
 }
-

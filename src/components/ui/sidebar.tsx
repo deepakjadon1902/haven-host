@@ -506,8 +506,7 @@ const sidebarMenuButtonVariants = cva(
     variants: {
       variant: {
         default: "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-        outline:
-          "bg-background hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+        outline: "bg-background hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
       },
       size: {
         default: "h-8 text-sm",

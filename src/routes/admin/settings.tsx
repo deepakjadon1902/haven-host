@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+﻿import { createFileRoute } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -7,7 +7,7 @@ import type { HotelSettings } from "@/types/room";
 import { getHotelSettings } from "@/lib/rooms.functions";
 import { adminUpdateHotelSettings } from "@/lib/admin.functions";
 
-export const Route = createFileRoute("/_authenticated/admin/settings")({
+export const Route = createFileRoute("/admin/settings")({
   head: () => ({
     meta: [{ title: "Settings — Admin Panel" }],
   }),
@@ -85,7 +85,11 @@ function AdminSettings() {
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
         <h1 className="mb-8 text-4xl font-bold text-black">Settings</h1>
 
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8 rounded-lg border-2 border-black bg-white p-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-8 rounded-lg border-2 border-black bg-white p-6"
+        >
           <h2 className="mb-6 text-2xl font-bold text-black">Hotel Information</h2>
 
           <div className="space-y-6">
@@ -162,7 +166,11 @@ function AdminSettings() {
               />
               {heroImage.trim() ? (
                 <div className="mt-3 overflow-hidden rounded border border-black/10">
-                  <img src={heroImage.trim()} alt="Hero preview" className="h-40 w-full object-cover" />
+                  <img
+                    src={heroImage.trim()}
+                    alt="Hero preview"
+                    className="h-40 w-full object-cover"
+                  />
                 </div>
               ) : null}
             </div>
@@ -200,7 +208,11 @@ function AdminSettings() {
         </motion.div>
 
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}>
-          <Button onClick={handleSave} disabled={isSaving} className="bg-black px-8 py-3 font-bold text-white hover:bg-gray-800">
+          <Button
+            onClick={handleSave}
+            disabled={isSaving}
+            className="bg-black px-8 py-3 font-bold text-white hover:bg-gray-800"
+          >
             {isSaving ? "Saving..." : "Save Changes"}
           </Button>
         </motion.div>

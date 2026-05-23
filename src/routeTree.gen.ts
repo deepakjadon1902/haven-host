@@ -12,33 +12,38 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as TestimonialsRouteImport } from './routes/testimonials'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as SignupRouteImport } from './routes/signup'
 import { Route as RoomsRouteImport } from './routes/rooms'
+import { Route as RefundPolicyRouteImport } from './routes/refund-policy'
 import { Route as RefundRouteImport } from './routes/refund'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PaymentRouteImport } from './routes/payment'
 import { Route as OffersRouteImport } from './routes/offers'
 import { Route as MyBookingsRouteImport } from './routes/my-bookings'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as LegalRouteImport } from './routes/legal'
+import { Route as JournalRouteImport } from './routes/journal'
 import { Route as HotelsRouteImport } from './routes/hotels'
 import { Route as GalleryRouteImport } from './routes/gallery'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as CompanyRouteImport } from './routes/company'
 import { Route as BlogsRouteImport } from './routes/blogs'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
-import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as RoomsIndexRouteImport } from './routes/rooms/index'
 import { Route as BookingIndexRouteImport } from './routes/booking/index'
+import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as RoomsSlugRouteImport } from './routes/rooms/$slug'
 import { Route as MyBookingsIdRouteImport } from './routes/my-bookings/$id'
 import { Route as BookingSuccessRouteImport } from './routes/booking/success'
 import { Route as BookingFailedRouteImport } from './routes/booking/failed'
-import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
-import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
-import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin/settings'
-import { Route as AuthenticatedAdminRoomsRouteImport } from './routes/_authenticated/admin/rooms'
-import { Route as AuthenticatedAdminCalendarRouteImport } from './routes/_authenticated/admin/calendar'
-import { Route as AuthenticatedAdminBookingsRouteImport } from './routes/_authenticated/admin/bookings'
+import { Route as AdminSettingsRouteImport } from './routes/admin/settings'
+import { Route as AdminRoomsRouteImport } from './routes/admin/rooms'
+import { Route as AdminLoginRouteImport } from './routes/admin/login'
+import { Route as AdminCalendarRouteImport } from './routes/admin/calendar'
+import { Route as AdminBookingsRouteImport } from './routes/admin/bookings'
 
 const TestimonialsRoute = TestimonialsRouteImport.update({
   id: '/testimonials',
@@ -55,9 +60,19 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RoomsRoute = RoomsRouteImport.update({
   id: '/rooms',
   path: '/rooms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RefundPolicyRoute = RefundPolicyRouteImport.update({
+  id: '/refund-policy',
+  path: '/refund-policy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RefundRoute = RefundRouteImport.update({
@@ -90,6 +105,16 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LegalRoute = LegalRouteImport.update({
+  id: '/legal',
+  path: '/legal',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JournalRoute = JournalRouteImport.update({
+  id: '/journal',
+  path: '/journal',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const HotelsRoute = HotelsRouteImport.update({
   id: '/hotels',
   path: '/hotels',
@@ -110,18 +135,24 @@ const ContactRoute = ContactRouteImport.update({
   path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CompanyRoute = CompanyRouteImport.update({
+  id: '/company',
+  path: '/company',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BlogsRoute = BlogsRouteImport.update({
   id: '/blogs',
   path: '/blogs',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthenticatedRoute = AuthenticatedRouteImport.update({
-  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -138,6 +169,11 @@ const BookingIndexRoute = BookingIndexRouteImport.update({
   id: '/booking/',
   path: '/booking/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
 } as any)
 const RoomsSlugRoute = RoomsSlugRouteImport.update({
   id: '/$slug',
@@ -159,244 +195,275 @@ const BookingFailedRoute = BookingFailedRouteImport.update({
   path: '/booking/failed',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
-  getParentRoute: () => AuthenticatedRoute,
+const AdminSettingsRoute = AdminSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AdminRoute,
 } as any)
-const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AuthenticatedAdminRoute,
-} as any)
-const AuthenticatedAdminSettingsRoute =
-  AuthenticatedAdminSettingsRouteImport.update({
-    id: '/settings',
-    path: '/settings',
-    getParentRoute: () => AuthenticatedAdminRoute,
-  } as any)
-const AuthenticatedAdminRoomsRoute = AuthenticatedAdminRoomsRouteImport.update({
+const AdminRoomsRoute = AdminRoomsRouteImport.update({
   id: '/rooms',
   path: '/rooms',
-  getParentRoute: () => AuthenticatedAdminRoute,
+  getParentRoute: () => AdminRoute,
 } as any)
-const AuthenticatedAdminCalendarRoute =
-  AuthenticatedAdminCalendarRouteImport.update({
-    id: '/calendar',
-    path: '/calendar',
-    getParentRoute: () => AuthenticatedAdminRoute,
-  } as any)
-const AuthenticatedAdminBookingsRoute =
-  AuthenticatedAdminBookingsRouteImport.update({
-    id: '/bookings',
-    path: '/bookings',
-    getParentRoute: () => AuthenticatedAdminRoute,
-  } as any)
+const AdminLoginRoute = AdminLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminCalendarRoute = AdminCalendarRouteImport.update({
+  id: '/calendar',
+  path: '/calendar',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminBookingsRoute = AdminBookingsRouteImport.update({
+  id: '/bookings',
+  path: '/bookings',
+  getParentRoute: () => AdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/admin': typeof AdminRouteWithChildren
   '/blogs': typeof BlogsRoute
+  '/company': typeof CompanyRoute
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
   '/gallery': typeof GalleryRoute
   '/hotels': typeof HotelsRoute
+  '/journal': typeof JournalRoute
+  '/legal': typeof LegalRoute
   '/login': typeof LoginRoute
   '/my-bookings': typeof MyBookingsRouteWithChildren
   '/offers': typeof OffersRoute
   '/payment': typeof PaymentRoute
   '/privacy': typeof PrivacyRoute
   '/refund': typeof RefundRoute
+  '/refund-policy': typeof RefundPolicyRoute
   '/rooms': typeof RoomsRouteWithChildren
+  '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/testimonials': typeof TestimonialsRoute
-  '/admin': typeof AuthenticatedAdminRouteWithChildren
+  '/admin/bookings': typeof AdminBookingsRoute
+  '/admin/calendar': typeof AdminCalendarRoute
+  '/admin/login': typeof AdminLoginRoute
+  '/admin/rooms': typeof AdminRoomsRoute
+  '/admin/settings': typeof AdminSettingsRoute
   '/booking/failed': typeof BookingFailedRoute
   '/booking/success': typeof BookingSuccessRoute
   '/my-bookings/$id': typeof MyBookingsIdRoute
   '/rooms/$slug': typeof RoomsSlugRoute
+  '/admin/': typeof AdminIndexRoute
   '/booking/': typeof BookingIndexRoute
   '/rooms/': typeof RoomsIndexRoute
-  '/admin/bookings': typeof AuthenticatedAdminBookingsRoute
-  '/admin/calendar': typeof AuthenticatedAdminCalendarRoute
-  '/admin/rooms': typeof AuthenticatedAdminRoomsRoute
-  '/admin/settings': typeof AuthenticatedAdminSettingsRoute
-  '/admin/': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/blogs': typeof BlogsRoute
+  '/company': typeof CompanyRoute
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
   '/gallery': typeof GalleryRoute
   '/hotels': typeof HotelsRoute
+  '/journal': typeof JournalRoute
+  '/legal': typeof LegalRoute
   '/login': typeof LoginRoute
   '/my-bookings': typeof MyBookingsRouteWithChildren
   '/offers': typeof OffersRoute
   '/payment': typeof PaymentRoute
   '/privacy': typeof PrivacyRoute
   '/refund': typeof RefundRoute
+  '/refund-policy': typeof RefundPolicyRoute
+  '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/testimonials': typeof TestimonialsRoute
+  '/admin/bookings': typeof AdminBookingsRoute
+  '/admin/calendar': typeof AdminCalendarRoute
+  '/admin/login': typeof AdminLoginRoute
+  '/admin/rooms': typeof AdminRoomsRoute
+  '/admin/settings': typeof AdminSettingsRoute
   '/booking/failed': typeof BookingFailedRoute
   '/booking/success': typeof BookingSuccessRoute
   '/my-bookings/$id': typeof MyBookingsIdRoute
   '/rooms/$slug': typeof RoomsSlugRoute
+  '/admin': typeof AdminIndexRoute
   '/booking': typeof BookingIndexRoute
   '/rooms': typeof RoomsIndexRoute
-  '/admin/bookings': typeof AuthenticatedAdminBookingsRoute
-  '/admin/calendar': typeof AuthenticatedAdminCalendarRoute
-  '/admin/rooms': typeof AuthenticatedAdminRoomsRoute
-  '/admin/settings': typeof AuthenticatedAdminSettingsRoute
-  '/admin': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/about': typeof AboutRoute
+  '/admin': typeof AdminRouteWithChildren
   '/blogs': typeof BlogsRoute
+  '/company': typeof CompanyRoute
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
   '/gallery': typeof GalleryRoute
   '/hotels': typeof HotelsRoute
+  '/journal': typeof JournalRoute
+  '/legal': typeof LegalRoute
   '/login': typeof LoginRoute
   '/my-bookings': typeof MyBookingsRouteWithChildren
   '/offers': typeof OffersRoute
   '/payment': typeof PaymentRoute
   '/privacy': typeof PrivacyRoute
   '/refund': typeof RefundRoute
+  '/refund-policy': typeof RefundPolicyRoute
   '/rooms': typeof RoomsRouteWithChildren
+  '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/testimonials': typeof TestimonialsRoute
-  '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
+  '/admin/bookings': typeof AdminBookingsRoute
+  '/admin/calendar': typeof AdminCalendarRoute
+  '/admin/login': typeof AdminLoginRoute
+  '/admin/rooms': typeof AdminRoomsRoute
+  '/admin/settings': typeof AdminSettingsRoute
   '/booking/failed': typeof BookingFailedRoute
   '/booking/success': typeof BookingSuccessRoute
   '/my-bookings/$id': typeof MyBookingsIdRoute
   '/rooms/$slug': typeof RoomsSlugRoute
+  '/admin/': typeof AdminIndexRoute
   '/booking/': typeof BookingIndexRoute
   '/rooms/': typeof RoomsIndexRoute
-  '/_authenticated/admin/bookings': typeof AuthenticatedAdminBookingsRoute
-  '/_authenticated/admin/calendar': typeof AuthenticatedAdminCalendarRoute
-  '/_authenticated/admin/rooms': typeof AuthenticatedAdminRoomsRoute
-  '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
-  '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/about'
+    | '/admin'
     | '/blogs'
+    | '/company'
     | '/contact'
     | '/faq'
     | '/gallery'
     | '/hotels'
+    | '/journal'
+    | '/legal'
     | '/login'
     | '/my-bookings'
     | '/offers'
     | '/payment'
     | '/privacy'
     | '/refund'
+    | '/refund-policy'
     | '/rooms'
+    | '/signup'
     | '/sitemap.xml'
     | '/terms'
     | '/testimonials'
-    | '/admin'
+    | '/admin/bookings'
+    | '/admin/calendar'
+    | '/admin/login'
+    | '/admin/rooms'
+    | '/admin/settings'
     | '/booking/failed'
     | '/booking/success'
     | '/my-bookings/$id'
     | '/rooms/$slug'
+    | '/admin/'
     | '/booking/'
     | '/rooms/'
-    | '/admin/bookings'
-    | '/admin/calendar'
-    | '/admin/rooms'
-    | '/admin/settings'
-    | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
     | '/blogs'
+    | '/company'
     | '/contact'
     | '/faq'
     | '/gallery'
     | '/hotels'
+    | '/journal'
+    | '/legal'
     | '/login'
     | '/my-bookings'
     | '/offers'
     | '/payment'
     | '/privacy'
     | '/refund'
+    | '/refund-policy'
+    | '/signup'
     | '/sitemap.xml'
     | '/terms'
     | '/testimonials'
+    | '/admin/bookings'
+    | '/admin/calendar'
+    | '/admin/login'
+    | '/admin/rooms'
+    | '/admin/settings'
     | '/booking/failed'
     | '/booking/success'
     | '/my-bookings/$id'
     | '/rooms/$slug'
+    | '/admin'
     | '/booking'
     | '/rooms'
-    | '/admin/bookings'
-    | '/admin/calendar'
-    | '/admin/rooms'
-    | '/admin/settings'
-    | '/admin'
   id:
     | '__root__'
     | '/'
-    | '/_authenticated'
     | '/about'
+    | '/admin'
     | '/blogs'
+    | '/company'
     | '/contact'
     | '/faq'
     | '/gallery'
     | '/hotels'
+    | '/journal'
+    | '/legal'
     | '/login'
     | '/my-bookings'
     | '/offers'
     | '/payment'
     | '/privacy'
     | '/refund'
+    | '/refund-policy'
     | '/rooms'
+    | '/signup'
     | '/sitemap.xml'
     | '/terms'
     | '/testimonials'
-    | '/_authenticated/admin'
+    | '/admin/bookings'
+    | '/admin/calendar'
+    | '/admin/login'
+    | '/admin/rooms'
+    | '/admin/settings'
     | '/booking/failed'
     | '/booking/success'
     | '/my-bookings/$id'
     | '/rooms/$slug'
+    | '/admin/'
     | '/booking/'
     | '/rooms/'
-    | '/_authenticated/admin/bookings'
-    | '/_authenticated/admin/calendar'
-    | '/_authenticated/admin/rooms'
-    | '/_authenticated/admin/settings'
-    | '/_authenticated/admin/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AboutRoute: typeof AboutRoute
+  AdminRoute: typeof AdminRouteWithChildren
   BlogsRoute: typeof BlogsRoute
+  CompanyRoute: typeof CompanyRoute
   ContactRoute: typeof ContactRoute
   FaqRoute: typeof FaqRoute
   GalleryRoute: typeof GalleryRoute
   HotelsRoute: typeof HotelsRoute
+  JournalRoute: typeof JournalRoute
+  LegalRoute: typeof LegalRoute
   LoginRoute: typeof LoginRoute
   MyBookingsRoute: typeof MyBookingsRouteWithChildren
   OffersRoute: typeof OffersRoute
   PaymentRoute: typeof PaymentRoute
   PrivacyRoute: typeof PrivacyRoute
   RefundRoute: typeof RefundRoute
+  RefundPolicyRoute: typeof RefundPolicyRoute
   RoomsRoute: typeof RoomsRouteWithChildren
+  SignupRoute: typeof SignupRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
   TestimonialsRoute: typeof TestimonialsRoute
@@ -428,11 +495,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/rooms': {
       id: '/rooms'
       path: '/rooms'
       fullPath: '/rooms'
       preLoaderRoute: typeof RoomsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/refund-policy': {
+      id: '/refund-policy'
+      path: '/refund-policy'
+      fullPath: '/refund-policy'
+      preLoaderRoute: typeof RefundPolicyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/refund': {
@@ -477,6 +558,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/legal': {
+      id: '/legal'
+      path: '/legal'
+      fullPath: '/legal'
+      preLoaderRoute: typeof LegalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/journal': {
+      id: '/journal'
+      path: '/journal'
+      fullPath: '/journal'
+      preLoaderRoute: typeof JournalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/hotels': {
       id: '/hotels'
       path: '/hotels'
@@ -505,6 +600,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/company': {
+      id: '/company'
+      path: '/company'
+      fullPath: '/company'
+      preLoaderRoute: typeof CompanyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/blogs': {
       id: '/blogs'
       path: '/blogs'
@@ -512,18 +614,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlogsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/about': {
       id: '/about'
       path: '/about'
       fullPath: '/about'
       preLoaderRoute: typeof AboutRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated': {
-      id: '/_authenticated'
-      path: ''
-      fullPath: '/'
-      preLoaderRoute: typeof AuthenticatedRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -546,6 +648,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/booking/'
       preLoaderRoute: typeof BookingIndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/rooms/$slug': {
       id: '/rooms/$slug'
@@ -575,81 +684,63 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BookingFailedRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/admin': {
-      id: '/_authenticated/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AuthenticatedAdminRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/admin/': {
-      id: '/_authenticated/admin/'
-      path: '/'
-      fullPath: '/admin/'
-      preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
-    '/_authenticated/admin/settings': {
-      id: '/_authenticated/admin/settings'
+    '/admin/settings': {
+      id: '/admin/settings'
       path: '/settings'
       fullPath: '/admin/settings'
-      preLoaderRoute: typeof AuthenticatedAdminSettingsRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
+      preLoaderRoute: typeof AdminSettingsRouteImport
+      parentRoute: typeof AdminRoute
     }
-    '/_authenticated/admin/rooms': {
-      id: '/_authenticated/admin/rooms'
+    '/admin/rooms': {
+      id: '/admin/rooms'
       path: '/rooms'
       fullPath: '/admin/rooms'
-      preLoaderRoute: typeof AuthenticatedAdminRoomsRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
+      preLoaderRoute: typeof AdminRoomsRouteImport
+      parentRoute: typeof AdminRoute
     }
-    '/_authenticated/admin/calendar': {
-      id: '/_authenticated/admin/calendar'
+    '/admin/login': {
+      id: '/admin/login'
+      path: '/login'
+      fullPath: '/admin/login'
+      preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/calendar': {
+      id: '/admin/calendar'
       path: '/calendar'
       fullPath: '/admin/calendar'
-      preLoaderRoute: typeof AuthenticatedAdminCalendarRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
+      preLoaderRoute: typeof AdminCalendarRouteImport
+      parentRoute: typeof AdminRoute
     }
-    '/_authenticated/admin/bookings': {
-      id: '/_authenticated/admin/bookings'
+    '/admin/bookings': {
+      id: '/admin/bookings'
       path: '/bookings'
       fullPath: '/admin/bookings'
-      preLoaderRoute: typeof AuthenticatedAdminBookingsRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
+      preLoaderRoute: typeof AdminBookingsRouteImport
+      parentRoute: typeof AdminRoute
     }
   }
 }
 
-interface AuthenticatedAdminRouteChildren {
-  AuthenticatedAdminBookingsRoute: typeof AuthenticatedAdminBookingsRoute
-  AuthenticatedAdminCalendarRoute: typeof AuthenticatedAdminCalendarRoute
-  AuthenticatedAdminRoomsRoute: typeof AuthenticatedAdminRoomsRoute
-  AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
-  AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+interface AdminRouteChildren {
+  AdminBookingsRoute: typeof AdminBookingsRoute
+  AdminCalendarRoute: typeof AdminCalendarRoute
+  AdminLoginRoute: typeof AdminLoginRoute
+  AdminRoomsRoute: typeof AdminRoomsRoute
+  AdminSettingsRoute: typeof AdminSettingsRoute
+  AdminIndexRoute: typeof AdminIndexRoute
 }
 
-const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
-  AuthenticatedAdminBookingsRoute: AuthenticatedAdminBookingsRoute,
-  AuthenticatedAdminCalendarRoute: AuthenticatedAdminCalendarRoute,
-  AuthenticatedAdminRoomsRoute: AuthenticatedAdminRoomsRoute,
-  AuthenticatedAdminSettingsRoute: AuthenticatedAdminSettingsRoute,
-  AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminBookingsRoute: AdminBookingsRoute,
+  AdminCalendarRoute: AdminCalendarRoute,
+  AdminLoginRoute: AdminLoginRoute,
+  AdminRoomsRoute: AdminRoomsRoute,
+  AdminSettingsRoute: AdminSettingsRoute,
+  AdminIndexRoute: AdminIndexRoute,
 }
 
-const AuthenticatedAdminRouteWithChildren =
-  AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
-
-interface AuthenticatedRouteChildren {
-  AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
-}
-
-const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
-  AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
-}
-
-const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
-  AuthenticatedRouteChildren,
-)
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 interface MyBookingsRouteChildren {
   MyBookingsIdRoute: typeof MyBookingsIdRoute
@@ -677,20 +768,25 @@ const RoomsRouteWithChildren = RoomsRoute._addFileChildren(RoomsRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AboutRoute: AboutRoute,
+  AdminRoute: AdminRouteWithChildren,
   BlogsRoute: BlogsRoute,
+  CompanyRoute: CompanyRoute,
   ContactRoute: ContactRoute,
   FaqRoute: FaqRoute,
   GalleryRoute: GalleryRoute,
   HotelsRoute: HotelsRoute,
+  JournalRoute: JournalRoute,
+  LegalRoute: LegalRoute,
   LoginRoute: LoginRoute,
   MyBookingsRoute: MyBookingsRouteWithChildren,
   OffersRoute: OffersRoute,
   PaymentRoute: PaymentRoute,
   PrivacyRoute: PrivacyRoute,
   RefundRoute: RefundRoute,
+  RefundPolicyRoute: RefundPolicyRoute,
   RoomsRoute: RoomsRouteWithChildren,
+  SignupRoute: SignupRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
   TestimonialsRoute: TestimonialsRoute,

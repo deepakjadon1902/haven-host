@@ -74,9 +74,7 @@ export function AuthCard({
               Maison<span className="gold-text">Noir</span>
             </span>
           </Link>
-          <p className="text-xs uppercase tracking-[0.25em] text-gold font-semibold">
-            {eyebrow}
-          </p>
+          <p className="text-xs uppercase tracking-[0.25em] text-gold font-semibold">{eyebrow}</p>
           <h1 className="mt-3 font-display text-3xl md:text-4xl font-semibold">{title}</h1>
           <p className="mt-2 text-white/65">{subtitle}</p>
           <div className="mt-8">{children}</div>

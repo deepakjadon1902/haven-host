@@ -35,7 +35,10 @@ function BookingDetailPage() {
     <SiteLayout>
       <div className="mx-auto max-w-3xl px-5 py-10 lg:px-8 lg:py-14">
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-          <Link to="/my-bookings" className="inline-flex items-center gap-2 text-sm text-gray-700 hover:text-black">
+          <Link
+            to="/my-bookings"
+            className="inline-flex items-center gap-2 text-sm text-gray-700 hover:text-black"
+          >
             <ArrowLeft className="h-4 w-4" /> Back to my bookings
           </Link>
           <h1 className="mt-4 font-display text-4xl font-semibold text-black">Booking details</h1>
@@ -49,7 +52,10 @@ function BookingDetailPage() {
           <Row k="Check-in" v={b.check_in} />
           <Row k="Check-out" v={b.check_out} />
           <Row k="Nights" v={`${b.nights}`} />
-          <Row k="Guests" v={`${b.adults + b.children} (${b.adults} adults, ${b.children} children)`} />
+          <Row
+            k="Guests"
+            v={`${b.adults + b.children} (${b.adults} adults, ${b.children} children)`}
+          />
           <Row k="Guest name" v={b.guest_full_name} />
           <Row k="Guest email" v={b.guest_email} />
           <Row k="Guest phone" v={b.guest_phone} />
@@ -67,4 +73,3 @@ function BookingDetailPage() {
     </SiteLayout>
   );
 }
-

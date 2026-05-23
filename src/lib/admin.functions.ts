@@ -14,7 +14,12 @@ import {
 } from "@/lib/local-store";
 
 const roomSchema = z.object({
-  slug: z.string().trim().min(1).max(120).regex(/^[a-z0-9-]+$/, "lowercase letters, numbers and hyphens only"),
+  slug: z
+    .string()
+    .trim()
+    .min(1)
+    .max(120)
+    .regex(/^[a-z0-9-]+$/, "lowercase letters, numbers and hyphens only"),
   name: z.string().trim().min(1).max(120),
   description: z.string().trim().max(4000).default(""),
   price_per_night_cents: z.number().int().min(0).max(100_000_000),
@@ -108,7 +113,11 @@ export async function adminDeleteRoom(input: unknown): Promise<{ ok: true }> {
   return { ok: true };
 }
 
-export async function adminListInventory(input: unknown): Promise<{ inventory: unknown[]; bookings: unknown[]; room: { name: string; total_units: number } }> {
+export async function adminListInventory(input: unknown): Promise<{
+  inventory: unknown[];
+  bookings: unknown[];
+  room: { name: string; total_units: number };
+}> {
   ensureSeeded();
   const validated = z
     .object({
@@ -117,7 +126,11 @@ export async function adminListInventory(input: unknown): Promise<{ inventory: u
       to: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
     })
     .parse(input);
-  return getInventoryAndBookings({ roomId: validated.roomId, from: validated.from, to: validated.to });
+  return getInventoryAndBookings({
+    roomId: validated.roomId,
+    from: validated.from,
+    to: validated.to,
+  });
 }
 
 export async function adminSetInventory(input: unknown): Promise<{ ok: true }> {
@@ -181,10 +194,11 @@ export async function adminDashboardStats(): Promise<{
   const totalBookings30d = last30.length;
 
   // Occupancy today = booked units / total units (active)
-  const bookedToday = allBookings
-    .filter((b) => b.status !== "cancelled" && b.check_in <= todayIso && todayIso < b.check_out)
-    .length;
-  const occupancyPct = totalUnits > 0 ? Math.min(100, Math.round((bookedToday / totalUnits) * 100)) : 0;
+  const bookedToday = allBookings.filter(
+    (b) => b.status !== "cancelled" && b.check_in <= todayIso && todayIso < b.check_out,
+  ).length;
+  const occupancyPct =
+    totalUnits > 0 ? Math.min(100, Math.round((bookedToday / totalUnits) * 100)) : 0;
 
   const upcoming = allBookings
     .filter((b) => b.check_in >= todayIso && b.status !== "cancelled")
@@ -201,7 +215,8 @@ export async function adminDashboardStats(): Promise<{
     }));
 
   // Chart = bookings created per day (last 14 days)
-  const toDayStart = (d: Date) => new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
+  const toDayStart = (d: Date) =>
+    new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
   const dayIso = (d: Date) => toDayStart(d).toISOString().slice(0, 10);
   const now = new Date();
   const chartDays: string[] = [];

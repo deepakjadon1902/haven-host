@@ -16,11 +16,7 @@ export function HotelCard({ hotel, index = 0 }: HotelCardProps) {
       viewport={{ once: true, margin: "-60px" }}
       transition={{ duration: 0.5, delay: index * 0.1 }}
     >
-      <Link
-        to="/rooms/$slug"
-        params={{ slug: hotel.slug }}
-        className="group block"
-      >
+      <Link to="/rooms/$slug" params={{ slug: hotel.slug }} className="group block">
         <div className="relative overflow-hidden rounded-3xl border-2 border-black bg-white transition-all hover:border-yellow-500">
           {/* Image */}
           <div className="relative aspect-[4/3] overflow-hidden bg-muted">
@@ -40,9 +36,7 @@ export function HotelCard({ hotel, index = 0 }: HotelCardProps) {
             <h3 className="text-2xl font-display font-semibold group-hover:text-gold transition-colors line-clamp-2">
               {hotel.name}
             </h3>
-            <p className="mt-2 text-sm text-muted-foreground line-clamp-2">
-              {hotel.description}
-            </p>
+            <p className="mt-2 text-sm text-muted-foreground line-clamp-2">{hotel.description}</p>
 
             {/* Price and Features */}
             <div className="mt-4 space-y-3">

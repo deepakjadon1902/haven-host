@@ -23,7 +23,10 @@ export function getLocalUser(): LocalUser | null {
   }
 }
 
-export function signInWithPassword(input: { email: string; password: string }): { user: LocalUser | null; error: string | null } {
+export function signInWithPassword(input: { email: string; password: string }): {
+  user: LocalUser | null;
+  error: string | null;
+} {
   if (!isBrowser()) return { user: null, error: "Auth is only available in the browser" };
   const email = input.email.trim().toLowerCase();
   const password = input.password;
@@ -40,4 +43,3 @@ export function signOut() {
   if (!isBrowser()) return;
   window.localStorage.removeItem(AUTH_KEY);
 }
-

@@ -1,13 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { ComingSoon } from "@/components/site/ComingSoon";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/refund")({
-  head: () => ({ meta: [{ title: "Refund — Maison Noir" }] }),
-  component: () => (
-    <ComingSoon
-      eyebrow="Maison Noir"
-      title="Refund"
-      description="Polished details for this section are landing soon."
-    />
-  ),
+  beforeLoad: () => {
+    throw redirect({ to: "/refund-policy", replace: true });
+  },
 });

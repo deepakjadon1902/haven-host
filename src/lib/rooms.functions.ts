@@ -1,5 +1,12 @@
 import type { HotelSettings, Room, RoomAvailabilityMap } from "@/types/room";
-import { ensureSeeded, getRoomAvailability as localAvailability, getRoomById, getRoomBySlug, getSettings, listRooms } from "@/lib/local-store";
+import {
+  ensureSeeded,
+  getRoomAvailability as localAvailability,
+  getRoomById,
+  getRoomBySlug,
+  getSettings,
+  listRooms,
+} from "@/lib/local-store";
 
 export async function listPublicRooms(): Promise<Room[]> {
   ensureSeeded();
@@ -23,8 +30,11 @@ export async function getHotelSettings(): Promise<HotelSettings | null> {
   return getSettings();
 }
 
-export async function getRoomAvailability(input: { roomId: string; from: string; days: number }): Promise<RoomAvailabilityMap> {
+export async function getRoomAvailability(input: {
+  roomId: string;
+  from: string;
+  days: number;
+}): Promise<RoomAvailabilityMap> {
   ensureSeeded();
   return localAvailability(input.roomId, input.from, input.days);
 }
-

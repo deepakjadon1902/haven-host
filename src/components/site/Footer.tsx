@@ -15,7 +15,8 @@ export function Footer() {
             </span>
           </Link>
           <p className="mt-4 max-w-sm text-sm leading-relaxed text-gray-700">
-            A single-hotel booking system with owner-controlled inventory, transparent pricing, and calendar-aligned availability.
+            A single-hotel booking system with owner-controlled inventory, transparent pricing, and
+            calendar-aligned availability.
           </p>
           <div className="mt-6 flex gap-3">
             {[Instagram, Twitter, Facebook, Mail].map((Icon, i) => (
@@ -36,7 +37,7 @@ export function Footer() {
             { to: "/rooms", label: "Rooms" },
             { to: "/offers", label: "Offers" },
             { to: "/gallery", label: "Gallery" },
-            { to: "/blogs", label: "Journal" },
+            { to: "/journal", label: "Journal" },
           ]}
         />
         <FooterCol
@@ -51,9 +52,10 @@ export function Footer() {
         <FooterCol
           title="Legal"
           links={[
+            { to: "/legal", label: "Legal" },
             { to: "/terms", label: "Terms" },
             { to: "/privacy", label: "Privacy" },
-            { to: "/refund", label: "Refund Policy" },
+            { to: "/refund-policy", label: "Refund Policy" },
           ]}
         />
       </div>
@@ -71,7 +73,9 @@ export function Footer() {
 function FooterCol({ title, links }: { title: string; links: { to: string; label: string }[] }) {
   return (
     <div>
-      <h4 className="font-display text-sm font-semibold uppercase tracking-widest text-gold">{title}</h4>
+      <h4 className="font-display text-sm font-semibold uppercase tracking-widest text-gold">
+        {title}
+      </h4>
       <ul className="mt-4 space-y-2.5">
         {links.map((l) => (
           <li key={l.to}>
@@ -84,4 +88,3 @@ function FooterCol({ title, links }: { title: string; links: { to: string; label
     </div>
   );
 }
-
