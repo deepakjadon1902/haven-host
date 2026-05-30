@@ -12,7 +12,7 @@ import type { Room } from "@/types/room";
 
 export const Route = createFileRoute("/payment")({
   head: () => ({
-    meta: [{ title: "Payment â€” Maison Noir" }],
+    meta: [{ title: "Payment  — Maison Noir" }],
   }),
   component: PaymentPage,
 });

@@ -7,6 +7,7 @@ import { RoomCard } from "@/components/site/RoomCard";
 import { Button } from "@/components/ui/button";
 import type { Room } from "@/types/room";
 import { listPublicRooms } from "@/lib/rooms.functions";
+import { useAppDataRefresh } from "@/hooks/useAppDataRefresh";
 
 type Search = { q?: string };
 
@@ -16,7 +17,7 @@ export const Route = createFileRoute("/rooms/")({
   }),
   head: () => ({
     meta: [
-      { title: "Rooms â€” Maison Noir" },
+      { title: "Rooms — Maison Noir" },
       {
         name: "description",
         content: "Explore our rooms with live availability and transparent pricing.",
@@ -31,6 +32,7 @@ function RoomsPage() {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedFilter, setSelectedFilter] = useState<"all" | "active">("all");
+  const dataRefreshVersion = useAppDataRefresh(5_000);
 
   useEffect(() => {
     const load = async () => {
@@ -43,9 +45,8 @@ function RoomsPage() {
         setLoading(false);
       }
     };
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     load();
-  }, []);
+  }, [dataRefreshVersion]);
 
   const filteredRooms = useMemo(() => {
     let list = rooms.slice();
@@ -70,7 +71,7 @@ function RoomsPage() {
             Rooms for a <span className="gold-text italic">royal stay.</span>
           </h1>
           <p className="mt-4 max-w-2xl text-sm text-gray-700">
-            A single hotel, run by one owner â€” manage inventory in the admin panel and book with
+            A single hotel, run by one owner — manage inventory in the admin panel and book with
             live availability.
           </p>
         </motion.div>

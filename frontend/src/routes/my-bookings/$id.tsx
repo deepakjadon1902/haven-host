@@ -7,14 +7,14 @@ import { listBookings, type LocalBooking } from "@/lib/local-store";
 
 export const Route = createFileRoute("/my-bookings/$id")({
   head: () => ({
-    meta: [{ title: "Booking details â€” Maison Noir" }],
+    meta: [{ title: "Booking details — Maison Noir" }],
   }),
   component: BookingDetailPage,
 });
 
 function formatInr(cents: number) {
   const rupees = Math.round(cents / 100);
-  return `â‚¹${rupees.toLocaleString("en-IN")}`;
+  return ` ₹${rupees.toLocaleString("en-IN")}`;
 }
 
 function Row({ k, v }: { k: string; v: string }) {

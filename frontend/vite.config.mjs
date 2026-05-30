@@ -5,11 +5,7 @@ import tailwindcss from "@tailwindcss/vite";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 
 export default defineConfig({
-  plugins: [
-    tanstackStart({ server: { entry: "server" } }),
-    react(),
-    tailwindcss(),
-  ],
+  plugins: [tanstackStart({ server: { entry: "server" } }), react(), tailwindcss()],
   resolve: {
     alias: {
       "@": path.resolve(process.cwd(), "src"),

@@ -8,7 +8,7 @@ import { listBookingsByEmail } from "@/lib/bookings.functions";
 
 export const Route = createFileRoute("/my-bookings")({
   head: () => ({
-    meta: [{ title: "My bookings â€” Maison Noir" }],
+    meta: [{ title: "My bookings — Maison Noir" }],
   }),
   component: MyBookingsPage,
 });

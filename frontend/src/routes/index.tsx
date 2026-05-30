@@ -8,6 +8,7 @@ import { RoomCard } from "@/components/site/RoomCard";
 import { Button } from "@/components/ui/button";
 import type { Room } from "@/types/room";
 import { listPublicRooms } from "@/lib/rooms.functions";
+import { useAppDataRefresh } from "@/hooks/useAppDataRefresh";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -26,6 +27,7 @@ export const Route = createFileRoute("/")({
 function HomePage() {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [loading, setLoading] = useState(true);
+  const dataRefreshVersion = useAppDataRefresh(5_000);
 
   useEffect(() => {
     const load = async () => {
@@ -39,7 +41,7 @@ function HomePage() {
       }
     };
     load();
-  }, []);
+  }, [dataRefreshVersion]);
 
   return (
     <SiteLayout>

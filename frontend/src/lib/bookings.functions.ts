@@ -4,14 +4,22 @@ import {
   listBookingsByEmail as localListByEmail,
   type LocalBooking,
 } from "@/lib/local-store";
+import { emitAppDataChanged } from "@/lib/app-events";
 
 export async function createBooking(
   input: Parameters<typeof localCreateBooking>[0],
 ): Promise<LocalBooking> {
   if (hasApiBase()) {
-    return await apiFetch<LocalBooking>("/public/bookings", { method: "POST", json: input });
+    const booking = await apiFetch<LocalBooking>("/public/bookings", {
+      method: "POST",
+      json: input,
+    });
+    emitAppDataChanged("public:bookings:create");
+    return booking;
   }
-  return localCreateBooking(input);
+  const booking = localCreateBooking(input);
+  emitAppDataChanged("public:bookings:create");
+  return booking;
 }
 
 export async function listBookingsByEmail(email: string): Promise<LocalBooking[]> {

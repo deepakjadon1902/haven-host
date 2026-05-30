@@ -14,6 +14,7 @@ import {
 } from "@/lib/local-store";
 import { apiFetch, hasApiBase } from "@/lib/api-client";
 import { getAdminToken } from "@/lib/admin-session";
+import { emitAppDataChanged } from "@/lib/app-events";
 
 const roomSchema = z.object({
   slug: z
@@ -58,6 +59,48 @@ function fromRoomToDbInput(room: Room) {
   };
 }
 
+function fromDbToApiInput(data: z.infer<typeof roomSchema>) {
+  return {
+    slug: data.slug,
+    name: data.name,
+    description: data.description ?? "",
+    pricePerNightCents: data.price_per_night_cents,
+    maxAdults: data.max_adults,
+    maxChildren: data.max_children,
+    petsAllowed: data.pets_allowed,
+    size: data.size ?? null,
+    bedType: data.bed_type ?? null,
+    amenities: data.amenities ?? [],
+    images: data.images ?? [],
+    coverImage: data.cover_image ?? null,
+    totalUnits: data.total_units,
+    active: data.active,
+    sortOrder: data.sort_order,
+  };
+}
+
+function fromDbPatchToApiInput(
+  data: z.infer<typeof roomSchema> | Partial<z.infer<typeof roomSchema>>,
+) {
+  const out: Record<string, unknown> = {};
+  if ("slug" in data) out.slug = data.slug;
+  if ("name" in data) out.name = data.name;
+  if ("description" in data) out.description = data.description ?? "";
+  if ("price_per_night_cents" in data) out.pricePerNightCents = data.price_per_night_cents;
+  if ("max_adults" in data) out.maxAdults = data.max_adults;
+  if ("max_children" in data) out.maxChildren = data.max_children;
+  if ("pets_allowed" in data) out.petsAllowed = data.pets_allowed;
+  if ("size" in data) out.size = data.size ?? null;
+  if ("bed_type" in data) out.bedType = data.bed_type ?? null;
+  if ("amenities" in data) out.amenities = data.amenities ?? [];
+  if ("images" in data) out.images = data.images ?? [];
+  if ("cover_image" in data) out.coverImage = data.cover_image ?? null;
+  if ("total_units" in data) out.totalUnits = data.total_units;
+  if ("active" in data) out.active = data.active;
+  if ("sort_order" in data) out.sortOrder = data.sort_order;
+  return out;
+}
+
 function fromDbToRoom(data: z.infer<typeof roomSchema> & { id?: string }): Room {
   const images = data.images ?? [];
   return {
@@ -94,23 +137,33 @@ export async function adminCreateRoom(input: unknown): Promise<Room> {
   if (hasApiBase()) {
     const token = getAdminToken();
     const validated = roomSchema.parse(input);
-    return await apiFetch<Room>("/admin/rooms", { method: "POST", token, json: validated });
+    const room = await apiFetch<Room>("/admin/rooms", {
+      method: "POST",
+      token,
+      json: fromDbToApiInput(validated),
+    });
+    emitAppDataChanged("admin:rooms:create");
+    return room;
   }
   ensureSeeded();
   const validated = roomSchema.parse(input);
   const room = fromDbToRoom({ ...validated });
-  return upsertRoom(room);
+  const saved = upsertRoom(room);
+  emitAppDataChanged("admin:rooms:create");
+  return saved;
 }
 
 export async function adminUpdateRoom(input: unknown): Promise<Room> {
   if (hasApiBase()) {
     const token = getAdminToken();
     const validated = z.object({ id: z.string().min(1), patch: roomSchema.partial() }).parse(input);
-    return await apiFetch<Room>(`/admin/rooms/${encodeURIComponent(validated.id)}`, {
+    const room = await apiFetch<Room>(`/admin/rooms/${encodeURIComponent(validated.id)}`, {
       method: "PATCH",
       token,
-      json: validated.patch,
+      json: fromDbPatchToApiInput(validated.patch),
     });
+    emitAppDataChanged("admin:rooms:update");
+    return room;
   }
   ensureSeeded();
   const validated = z.object({ id: z.string().min(1), patch: roomSchema.partial() }).parse(input);
@@ -123,7 +176,9 @@ export async function adminUpdateRoom(input: unknown): Promise<Room> {
   });
 
   const nextRoom = fromDbToRoom({ ...(nextDb as z.infer<typeof roomSchema>), id: existing.id });
-  return upsertRoom(nextRoom);
+  const saved = upsertRoom(nextRoom);
+  emitAppDataChanged("admin:rooms:update");
+  return saved;
 }
 
 export async function adminDeleteRoom(input: unknown): Promise<{ ok: true }> {
@@ -134,11 +189,13 @@ export async function adminDeleteRoom(input: unknown): Promise<{ ok: true }> {
       method: "DELETE",
       token,
     });
+    emitAppDataChanged("admin:rooms:delete");
     return { ok: true };
   }
   ensureSeeded();
   const validated = z.object({ id: z.string().min(1) }).parse(input);
   deleteRoom(validated.id);
+  emitAppDataChanged("admin:rooms:delete");
   return { ok: true };
 }
 
@@ -152,8 +209,8 @@ export async function adminListInventory(input: unknown): Promise<{
     const validated = z
       .object({
         roomId: z.string().min(1),
-        from: z.string().regex(/^\\d{4}-\\d{2}-\\d{2}$/),
-        to: z.string().regex(/^\\d{4}-\\d{2}-\\d{2}$/),
+        from: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+        to: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
       })
       .parse(input);
     const qs = new URLSearchParams(validated);
@@ -163,8 +220,8 @@ export async function adminListInventory(input: unknown): Promise<{
   const validated = z
     .object({
       roomId: z.string().min(1),
-      from: z.string().regex(/^\\d{4}-\\d{2}-\\d{2}$/),
-      to: z.string().regex(/^\\d{4}-\\d{2}-\\d{2}$/),
+      from: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+      to: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
     })
     .parse(input);
   return getInventoryAndBookings({
@@ -180,24 +237,26 @@ export async function adminSetInventory(input: unknown): Promise<{ ok: true }> {
     const validated = z
       .object({
         roomId: z.string().min(1),
-        date: z.string().regex(/^\\d{4}-\\d{2}-\\d{2}$/),
+        date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
         status: z.enum(["closed", "maintenance", "open"]),
         note: z.string().max(280).optional(),
       })
       .parse(input);
     await apiFetch<{ ok: true }>("/admin/inventory", { method: "POST", token, json: validated });
+    emitAppDataChanged("admin:inventory:update");
     return { ok: true };
   }
   ensureSeeded();
   const validated = z
     .object({
       roomId: z.string().min(1),
-      date: z.string().regex(/^\\d{4}-\\d{2}-\\d{2}$/),
+      date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
       status: z.enum(["closed", "maintenance", "open"]),
       note: z.string().max(280).optional(),
     })
     .parse(input);
   setInventory(validated);
+  emitAppDataChanged("admin:inventory:update");
   return { ok: true };
 }
 
@@ -218,11 +277,13 @@ export async function adminCancelBooking(input: unknown): Promise<{ ok: true }> 
       method: "POST",
       token,
     });
+    emitAppDataChanged("admin:bookings:cancel");
     return { ok: true };
   }
   ensureSeeded();
   const validated = z.object({ id: z.string().min(1) }).parse(input);
   cancelBooking(validated.id);
+  emitAppDataChanged("admin:bookings:cancel");
   return { ok: true };
 }
 
@@ -315,7 +376,6 @@ export async function adminDashboardStats(): Promise<{
 }
 
 export async function adminUpdateHotelSettings(input: unknown) {
-  ensureSeeded();
   const validated = z
     .object({
       name: z.string().max(120).optional(),
@@ -329,7 +389,20 @@ export async function adminUpdateHotelSettings(input: unknown) {
       contactPhone: z.string().max(60).optional(),
     })
     .parse(input);
-  return updateSettings(validated);
+  if (hasApiBase()) {
+    const token = getAdminToken();
+    const settings = await apiFetch("/admin/settings", {
+      method: "PATCH",
+      token,
+      json: validated,
+    });
+    emitAppDataChanged("admin:settings:update");
+    return settings;
+  }
+  ensureSeeded();
+  const settings = updateSettings(validated);
+  emitAppDataChanged("admin:settings:update");
+  return settings;
 }
 
 // Exported for booking flow (client-only, no backend)

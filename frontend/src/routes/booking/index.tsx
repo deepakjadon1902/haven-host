@@ -24,6 +24,7 @@ import { Button } from "@/components/ui/button";
 import type { RoomAvailabilityMap, Room } from "@/types/room";
 import { getPublicRoomById, getRoomAvailability } from "@/lib/rooms.functions";
 import { savePaymentDraft } from "@/lib/local-store";
+import { useAppDataRefresh } from "@/hooks/useAppDataRefresh";
 
 type Search = { hotel?: string; room?: string; date?: string };
 
@@ -85,6 +86,8 @@ function BookingPage() {
   );
   const [availability, setAvailability] = useState<RoomAvailabilityMap | null>(null);
   const [availabilityLoading, setAvailabilityLoading] = useState(false);
+  const dataRefreshVersion = useAppDataRefresh(5_000);
+  const roomTypeId = roomType?.id;
 
   const maxAdults = roomType?.maxAdults ?? 2;
   const maxChildren = roomType?.maxChildren ?? 0;
@@ -112,15 +115,15 @@ function BookingPage() {
       }
     };
     loadRoom();
-  }, [roomId]);
+  }, [roomId, dataRefreshVersion]);
 
   useEffect(() => {
     const loadAvailability = async () => {
-      if (!roomType) return;
+      if (!roomTypeId) return;
       setAvailabilityLoading(true);
       try {
         const days = Math.min(120, Math.max(45, nights + 30));
-        const map = await getRoomAvailability({ roomId: roomType.id, from: checkIn, days });
+        const map = await getRoomAvailability({ roomId: roomTypeId, from: checkIn, days });
         setAvailability(map);
       } catch (error) {
         toast.error(error instanceof Error ? error.message : "Failed to load availability");
@@ -130,7 +133,7 @@ function BookingPage() {
       }
     };
     loadAvailability();
-  }, [roomType?.id, checkIn, nights]);
+  }, [roomTypeId, checkIn, nights, dataRefreshVersion]);
 
   const checkOut = useMemo(() => {
     const d = new Date(checkIn + "T00:00:00Z");

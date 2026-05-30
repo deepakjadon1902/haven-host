@@ -7,6 +7,7 @@ import { SiteLayout } from "@/components/site/SiteLayout";
 import { Button } from "@/components/ui/button";
 import type { RoomAvailabilityMap, Room } from "@/types/room";
 import { getPublicRoom, getRoomAvailability } from "@/lib/rooms.functions";
+import { useAppDataRefresh } from "@/hooks/useAppDataRefresh";
 
 export const Route = createFileRoute("/rooms/$slug")({
   head: ({ params }) => ({
@@ -42,6 +43,8 @@ function RoomDetailPage() {
   const [loading, setLoading] = useState(true);
   const [availability, setAvailability] = useState<RoomAvailabilityMap | null>(null);
   const [availabilityLoading, setAvailabilityLoading] = useState(false);
+  const dataRefreshVersion = useAppDataRefresh(5_000);
+  const roomId = room?.id;
 
   const isNotFoundError = (err: unknown): err is { isNotFound: true } =>
     !!err && typeof err === "object" && "isNotFound" in err;
@@ -61,15 +64,15 @@ function RoomDetailPage() {
       }
     };
     load();
-  }, [slug]);
+  }, [slug, dataRefreshVersion]);
 
   useEffect(() => {
-    if (!room) return;
+    if (!roomId) return;
     const load = async () => {
       setAvailabilityLoading(true);
       try {
         const from = todayIso();
-        const data = await getRoomAvailability({ roomId: room.id, from, days: 60 });
+        const data = await getRoomAvailability({ roomId, from, days: 60 });
         setAvailability(data);
       } catch (error) {
         toast.error(error instanceof Error ? error.message : "Failed to load availability");
@@ -78,7 +81,7 @@ function RoomDetailPage() {
       }
     };
     load();
-  }, [room?.id]);
+  }, [roomId, dataRefreshVersion]);
 
   const previewDays = useMemo(() => {
     const from = todayIso();

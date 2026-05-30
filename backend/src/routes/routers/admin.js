@@ -10,7 +10,10 @@ import { Booking } from "../../models/Booking.js";
 import { uploadImageBuffer } from "../../lib/cloudinary.js";
 
 export const adminRouter = Router();
-const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 6 * 1024 * 1024 } });
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 6 * 1024 * 1024 },
+});
 
 adminRouter.use(requireAuth, requireAdmin);
 
@@ -50,7 +53,9 @@ adminRouter.get("/settings", async (_req, res) => {
 
 adminRouter.patch("/settings", async (req, res) => {
   const patch = settingsSchema.parse(req.body);
-  const settings = (await Settings.findOne().sort({ updatedAt: -1 })) ?? (await Settings.create({}));
+  const settings =
+    (await Settings.findOne().sort({ updatedAt: -1 })) ??
+    (await Settings.create({}));
   Object.assign(settings, patch);
   await settings.save();
   res.json(toSettingsDto(settings));
@@ -60,8 +65,8 @@ adminRouter.get("/inventory", async (req, res) => {
   const input = z
     .object({
       roomId: z.string().min(1),
-      from: z.string().regex(/^\\d{4}-\\d{2}-\\d{2}$/),
-      to: z.string().regex(/^\\d{4}-\\d{2}-\\d{2}$/),
+      from: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+      to: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
     })
     .parse(req.query);
 
@@ -109,7 +114,7 @@ adminRouter.post("/inventory", async (req, res) => {
   const input = z
     .object({
       roomId: z.string().min(1),
-      date: z.string().regex(/^\\d{4}-\\d{2}-\\d{2}$/),
+      date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
       status: z.enum(["closed", "maintenance", "open"]),
       note: z.string().max(280).optional(),
     })
@@ -137,7 +142,10 @@ adminRouter.post("/inventory", async (req, res) => {
 });
 
 adminRouter.get("/bookings", async (_req, res) => {
-  const bookings = await Booking.find().sort({ createdAt: -1 }).limit(500).lean();
+  const bookings = await Booking.find()
+    .sort({ createdAt: -1 })
+    .limit(500)
+    .lean();
   res.json(bookings.map(toBookingDto));
 });
 
@@ -148,7 +156,10 @@ adminRouter.get("/stats", async (_req, res) => {
   const rooms = await Room.find().lean();
   const activeRooms = rooms.filter((r) => r.active);
   const totalRooms = rooms.length;
-  const totalUnits = activeRooms.reduce((sum, r) => sum + (r.totalUnits ?? 0), 0);
+  const totalUnits = activeRooms.reduce(
+    (sum, r) => sum + (r.totalUnits ?? 0),
+    0,
+  );
 
   const last30 = await Booking.find({ createdAt: { $gte: since30 } }).lean();
   const revenue30dCents = last30
@@ -162,7 +173,9 @@ adminRouter.get("/stats", async (_req, res) => {
     checkOut: { $gt: todayIso },
   });
   const occupancyPct =
-    totalUnits > 0 ? Math.min(100, Math.round((bookedToday / totalUnits) * 100)) : 0;
+    totalUnits > 0
+      ? Math.min(100, Math.round((bookedToday / totalUnits) * 100))
+      : 0;
 
   const upcomingBookings = await Booking.find({
     checkIn: { $gte: todayIso },
@@ -183,12 +196,15 @@ adminRouter.get("/stats", async (_req, res) => {
   }));
 
   const dayIso = (d) => {
-    const x = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
+    const x = new Date(
+      Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()),
+    );
     return x.toISOString().slice(0, 10);
   };
   const now = new Date();
   const chartDays = [];
-  for (let i = 13; i >= 0; i--) chartDays.push(dayIso(new Date(now.getTime() - i * 86400000)));
+  for (let i = 13; i >= 0; i--)
+    chartDays.push(dayIso(new Date(now.getTime() - i * 86400000)));
 
   const counts = new Map();
   for (const k of chartDays) counts.set(k, 0);
@@ -196,11 +212,16 @@ adminRouter.get("/stats", async (_req, res) => {
   const since14 = new Date(Date.now() - 14 * 86400000);
   const recent = await Booking.find({ createdAt: { $gte: since14 } }).lean();
   for (const b of recent) {
-    const d = (b.createdAt?.toISOString?.() ?? new Date(b.createdAt).toISOString()).slice(0, 10);
+    const d = (
+      b.createdAt?.toISOString?.() ?? new Date(b.createdAt).toISOString()
+    ).slice(0, 10);
     if (counts.has(d)) counts.set(d, (counts.get(d) ?? 0) + 1);
   }
 
-  const chart = chartDays.map((date) => ({ date, count: counts.get(date) ?? 0 }));
+  const chart = chartDays.map((date) => ({
+    date,
+    count: counts.get(date) ?? 0,
+  }));
 
   res.json({
     totalRooms,
@@ -291,7 +312,7 @@ function toRoomDto(r) {
     bedType: r.bedType ?? null,
     amenities: r.amenities ?? [],
     images: r.images ?? [],
-    coverImage: r.coverImage ?? (r.images?.[0] ?? ""),
+    coverImage: r.coverImage ?? r.images?.[0] ?? "",
     totalUnits: r.totalUnits ?? 1,
     active: r.active,
     sortOrder: r.sortOrder ?? 0,
@@ -330,7 +351,8 @@ function toBookingDto(b) {
     total_cents: b.totalCents,
     currency: b.currency,
     status: b.status,
-    created_at: b.createdAt?.toISOString?.() ?? new Date(b.createdAt).toISOString(),
+    created_at:
+      b.createdAt?.toISOString?.() ?? new Date(b.createdAt).toISOString(),
     payment_status: b.paymentStatus,
     payment_reference: b.paymentReference,
   };

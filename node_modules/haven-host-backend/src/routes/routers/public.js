@@ -9,7 +9,10 @@ import { getFromEmail, getResend } from "../../lib/resend.js";
 export const publicRouter = Router();
 
 publicRouter.get("/rooms", async (_req, res) => {
-  const rooms = await Room.find({ active: true }).sort({ sortOrder: 1, createdAt: -1 });
+  const rooms = await Room.find({ active: true }).sort({
+    sortOrder: 1,
+    createdAt: -1,
+  });
   res.json(rooms.map(toRoomDto));
 });
 
@@ -28,7 +31,7 @@ publicRouter.get("/availability", async (req, res) => {
   const input = z
     .object({
       roomId: z.string().min(1),
-      from: z.string().regex(/^\\d{4}-\\d{2}-\\d{2}$/),
+      from: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
       days: z.coerce.number().int().min(1).max(365),
     })
     .parse(req.query);
@@ -68,8 +71,11 @@ publicRouter.get("/availability", async (req, res) => {
   const available = {};
   let cur = input.from;
   for (let i = 0; i <= input.days; i++) {
-    const isBlocked = blocked[cur] === "closed" || blocked[cur] === "maintenance";
-    available[cur] = isBlocked ? 0 : Math.max(0, (room.totalUnits ?? 1) - (bookedCount[cur] ?? 0));
+    const isBlocked =
+      blocked[cur] === "closed" || blocked[cur] === "maintenance";
+    available[cur] = isBlocked
+      ? 0
+      : Math.max(0, (room.totalUnits ?? 1) - (bookedCount[cur] ?? 0));
     cur = addDays(cur, 1);
   }
 
@@ -77,7 +83,9 @@ publicRouter.get("/availability", async (req, res) => {
 });
 
 publicRouter.get("/bookings", async (req, res) => {
-  const input = z.object({ email: z.string().trim().email().max(255) }).parse(req.query);
+  const input = z
+    .object({ email: z.string().trim().email().max(255) })
+    .parse(req.query);
   const rows = await Booking.find({ guestEmail: input.email })
     .sort({ createdAt: -1 })
     .limit(200)
@@ -145,7 +153,7 @@ function toRoomDto(r) {
     bedType: r.bedType ?? null,
     amenities: r.amenities ?? [],
     images: r.images ?? [],
-    coverImage: r.coverImage ?? (r.images?.[0] ?? ""),
+    coverImage: r.coverImage ?? r.images?.[0] ?? "",
     totalUnits: r.totalUnits ?? 1,
     active: r.active,
     sortOrder: r.sortOrder ?? 0,
@@ -184,7 +192,8 @@ function toBookingDto(b) {
     total_cents: b.totalCents,
     currency: b.currency,
     status: b.status,
-    created_at: b.createdAt?.toISOString?.() ?? new Date(b.createdAt).toISOString(),
+    created_at:
+      b.createdAt?.toISOString?.() ?? new Date(b.createdAt).toISOString(),
     payment_status: b.paymentStatus,
     payment_reference: b.paymentReference,
   };
@@ -205,8 +214,8 @@ const bookingCreateSchema = z.object({
   hotel_name: z.string().trim().min(1).max(200).optional(),
   room_type_name: z.string().trim().min(1).max(200),
   room_id: z.string().trim().min(1).optional().nullable(),
-  check_in: z.string().regex(/^\\d{4}-\\d{2}-\\d{2}$/),
-  check_out: z.string().regex(/^\\d{4}-\\d{2}-\\d{2}$/),
+  check_in: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  check_out: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   nights: z.number().int().min(1).max(365),
   adults: z.number().int().min(1).max(20),
   children: z.number().int().min(0).max(20),
