@@ -8,14 +8,14 @@ import { listBookingsByEmail } from "@/lib/bookings.functions";
 
 export const Route = createFileRoute("/my-bookings")({
   head: () => ({
-    meta: [{ title: "My bookings — Maison Noir" }],
+    meta: [{ title: "My bookings - Maison Noir" }],
   }),
   component: MyBookingsPage,
 });
 
 function formatInr(cents: number) {
   const rupees = Math.round(cents / 100);
-  return `â‚¹${rupees.toLocaleString("en-IN")}`;
+  return `Rs ${rupees.toLocaleString("en-IN")}`;
 }
 
 function MyBookingsPage() {
@@ -100,7 +100,7 @@ function MyBookingsPage() {
                   </div>
                   <div className="mt-2 text-sm text-gray-700">{b.room_type_name}</div>
                   <div className="mt-1 text-xs text-gray-600">
-                    {b.check_in} â†’ {b.check_out} â€¢ {b.nights} night{b.nights !== 1 ? "s" : ""}
+                    {b.check_in} {"->"} {b.check_out} / {b.nights} night{b.nights !== 1 ? "s" : ""}
                   </div>
                 </div>
                 <div className="text-right">
@@ -112,7 +112,7 @@ function MyBookingsPage() {
                   </div>
                   <div className="mt-1 text-xs text-gray-600 capitalize">
                     Status: {b.status}
-                    {b.payment_status ? ` â€¢ ${b.payment_status}` : ""}
+                    {b.payment_status ? ` / ${b.payment_status}` : ""}
                   </div>
                 </div>
               </div>

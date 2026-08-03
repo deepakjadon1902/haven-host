@@ -7,14 +7,14 @@ import { listBookings, type LocalBooking } from "@/lib/local-store";
 
 export const Route = createFileRoute("/my-bookings/$id")({
   head: () => ({
-    meta: [{ title: "Booking details — Maison Noir" }],
+    meta: [{ title: "Booking details - Maison Noir" }],
   }),
   component: BookingDetailPage,
 });
 
 function formatInr(cents: number) {
   const rupees = Math.round(cents / 100);
-  return ` ₹${rupees.toLocaleString("en-IN")}`;
+  return `Rs ${rupees.toLocaleString("en-IN")}`;
 }
 
 function Row({ k, v }: { k: string; v: string }) {
@@ -60,7 +60,7 @@ function BookingDetailPage() {
           <Row k="Guest email" v={b.guest_email} />
           <Row k="Guest phone" v={b.guest_phone} />
           <Row k="Total" v={`${formatInr(b.total_cents)} ${b.currency}`} />
-          <Row k="Status" v={`${b.status}${b.payment_status ? ` â€¢ ${b.payment_status}` : ""}`} />
+          <Row k="Status" v={`${b.status}${b.payment_status ? ` / ${b.payment_status}` : ""}`} />
           <Row k="Created" v={new Date(b.created_at).toLocaleString()} />
         </div>
 

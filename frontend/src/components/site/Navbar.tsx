@@ -47,8 +47,7 @@ export function Navbar() {
 
         <nav className="hidden lg:flex items-center gap-1">
           {nav.map((item) => {
-            const active =
-              pathname === item.to || (item.to !== "/" && pathname.startsWith(item.to));
+            const active = pathname === item.to || pathname.startsWith(`${item.to}/`);
             return (
               <Link
                 key={item.to}

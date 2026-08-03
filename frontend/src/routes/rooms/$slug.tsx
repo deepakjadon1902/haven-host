@@ -224,8 +224,9 @@ function RoomDetailPage() {
                   <div className="mt-3 grid grid-cols-10 gap-2">
                     {previewDays.map((d) => {
                       const blocked = availability.blocked[d];
-                      const available = availability.available[d];
-                      const state = blocked ?? (available <= 0 ? "booked" : "open");
+                      const available = availability.available[d] ?? 0;
+                      const state: "open" | "booked" | "closed" | "maintenance" =
+                        blocked ?? (available <= 0 ? "booked" : "open");
                       const cls =
                         state === "open"
                           ? "bg-green-600"

@@ -65,5 +65,5 @@ export interface RoomAvailabilityMap {
   /** ISO date -> available unit count */
   available: Record<string, number>;
   /** ISO date -> "closed" | "maintenance" | "booked" (only set when fully blocked) */
-  blocked: Record<string, "closed" | "maintenance" | "booked">;
+  blocked: Partial<Record<string, "closed" | "maintenance" | "booked">>;
 }

@@ -12,14 +12,14 @@ import type { Room } from "@/types/room";
 
 export const Route = createFileRoute("/payment")({
   head: () => ({
-    meta: [{ title: "Payment  — Maison Noir" }],
+    meta: [{ title: "Payment - Maison Noir" }],
   }),
   component: PaymentPage,
 });
 
 function formatInr(cents: number) {
   const rupees = Math.round(cents / 100);
-  return `â‚¹${rupees.toLocaleString("en-IN")}`;
+  return `Rs ${rupees.toLocaleString("en-IN")}`;
 }
 
 function PaymentPage() {
@@ -43,8 +43,7 @@ function PaymentPage() {
       const r = await getPublicRoomById({ id: draft.room_id });
       setRoom(r);
     };
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    load();
+    void load();
   }, [draft?.room_id]);
 
   const taxesLabel = useMemo(() => {
@@ -123,7 +122,7 @@ function PaymentPage() {
               <div className="flex justify-between gap-4">
                 <span>Dates</span>
                 <span className="font-semibold text-black">
-                  {draft.check_in} â†’ {draft.check_out}
+                  {draft.check_in} {"->"} {draft.check_out}
                 </span>
               </div>
               <div className="flex justify-between gap-4">

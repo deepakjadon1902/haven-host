@@ -73,9 +73,10 @@ function PartnerShell() {
           <nav className="mt-6 space-y-1.5">
             {nav.map((item) => {
               const Icon = item.icon;
-              const active = item.exact
-                ? pathname === item.to
-                : pathname === item.to || pathname.startsWith(`${item.to}/`);
+              const active =
+                "exact" in item && item.exact
+                  ? pathname === item.to
+                  : pathname === item.to || pathname.startsWith(`${item.to}/`);
               return (
                 <Link
                   key={item.to}

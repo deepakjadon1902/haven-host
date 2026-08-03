@@ -163,7 +163,7 @@ function hasEmbeddedImages(data: z.infer<typeof roomSchema> | Partial<z.infer<ty
 }
 
 export async function adminListRooms(): Promise<Room[]> {
-  if (hasApiBase() && !hasEmbeddedImages(validated)) {
+  if (hasApiBase()) {
     const token = getAdminToken();
     try {
       return await apiFetch<Room[]>("/admin/rooms", { token });
@@ -177,7 +177,7 @@ export async function adminListRooms(): Promise<Room[]> {
 
 export async function adminCreateRoom(input: unknown): Promise<Room> {
   const validated = roomSchema.parse(input);
-  if (hasApiBase() && !hasEmbeddedImages(validated.patch)) {
+  if (hasApiBase() && !hasEmbeddedImages(validated)) {
     const token = getAdminToken();
     try {
       const room = await apiFetch<Room>("/admin/rooms", {

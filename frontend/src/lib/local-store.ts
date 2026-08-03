@@ -180,7 +180,7 @@ export function ensureSeeded() {
       tagline: MAIN_HOTEL.tagline ?? "Curated luxury hospitality",
       city: "Vrindavan",
       country: "India",
-      address: "Boutique property â€” address configurable in Admin > Settings",
+      address: "Boutique property - address configurable in Admin > Settings",
       description: MAIN_HOTEL.description,
       heroImage:
         "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=1600&q=80",
@@ -331,7 +331,7 @@ export function getSettings(): HotelSettings {
     tagline: MAIN_HOTEL.tagline ?? "Curated luxury hospitality",
     city: "Vrindavan",
     country: "India",
-    address: "Boutique property â€” address configurable in Admin > Settings",
+    address: "Boutique property - address configurable in Admin > Settings",
     description: MAIN_HOTEL.description,
     heroImage:
       "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=1600&q=80",
