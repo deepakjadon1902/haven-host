@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev",
-    "build": "vite build",
-    "build:dev": "vite build --mode development",
+    "build": "vite build --configLoader runner",
+    "build:dev": "vite build --mode development --configLoader runner",
     "preview": "vite preview",
     "lint": "eslint .",
     "format": "prettier --write ."

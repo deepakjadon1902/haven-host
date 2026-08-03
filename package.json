@@ -1,6 +1,13 @@
 {
   "name": "haven-host",
   "private": true,
+  "scripts": {
+    "build": "npm run build --workspace frontend",
+    "lint": "npm run lint --workspace frontend",
+    "typecheck": "npm exec --workspace frontend -- tsc --noEmit",
+    "check:backend": "node --check backend/src/index.js",
+    "check": "npm run typecheck && npm run build && npm run lint && npm run check:backend"
+  },
   "workspaces": [
     "frontend",
     "backend"
