@@ -8,7 +8,7 @@
     "build": "vite build --configLoader runner",
     "build:dev": "vite build --mode development --configLoader runner",
     "preview": "vite preview",
-    "lint": "eslint .",
+    "lint": "eslint \"src/**/*.{ts,tsx}\"",
     "format": "prettier --write ."
   },
   "dependencies": {
@@ -53,6 +53,7 @@
     "framer-motion": "^12.38.0",
     "input-otp": "^1.4.2",
     "lucide-react": "^0.575.0",
+    "nitro": "npm:nitro-nightly@^3.0.1-20260731-205209-52abde8a",
     "react": "^19.2.0",
     "react-day-picker": "^9.14.0",
     "react-dom": "^19.2.0",
@@ -83,5 +84,8 @@
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.56.1",
     "vite": "^7.3.1"
+  },
+  "optionalDependencies": {
+    "@rollup/rollup-linux-x64-gnu": "^4.60.4"
   }
 }
