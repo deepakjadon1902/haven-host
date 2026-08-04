@@ -1,5 +1,5 @@
 {
-  "installCommand": "npm install --no-audit",
+  "installCommand": "npm install --no-audit --no-fund",
   "buildCommand": "npm run build",
   "outputDirectory": "frontend/dist/client"
 }
