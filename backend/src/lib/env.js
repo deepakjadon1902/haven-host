@@ -13,6 +13,7 @@ const envSchema = z.object({
   RESEND_API_KEY: z.string().optional(),
   RESEND_FROM_EMAIL: z.string().optional(),
   APP_BASE_URL: z.string().optional(),
+  API_BASE_URL: z.string().optional(),
 });
 
 export function getEnv() {

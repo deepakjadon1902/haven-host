@@ -1,5 +1,5 @@
 import { apiFetch, hasApiBase } from "@/lib/api-client";
-import { setUserToken } from "@/lib/user-session";
+import { setStoredUser, setUserToken, type AppUser } from "@/lib/user-session";
 
 declare global {
   interface Window {
@@ -59,7 +59,7 @@ export function canUseGoogleAuth() {
 
 export async function renderGoogleButton(opts: {
   container: HTMLElement;
-  onSuccess: (result: { token: string; user: { email: string; role: string } }) => void;
+  onSuccess: (result: { token: string; user: AppUser }) => void;
   onError: (error: Error) => void;
   variant?: "signin" | "signup";
 }) {
@@ -82,11 +82,12 @@ export async function renderGoogleButton(opts: {
         try {
           const credential = response?.credential;
           if (!credential) throw new Error("Missing Google credential");
-          const result = await apiFetch<{ token: string; user: { email: string; role: string } }>(
-            "/auth/google",
-            { method: "POST", json: { credential } },
-          );
+          const result = await apiFetch<{ token: string; user: AppUser }>("/auth/google", {
+            method: "POST",
+            json: { credential },
+          });
           setUserToken(result.token);
+          setStoredUser(result.user);
           opts.onSuccess(result);
         } catch (e) {
           opts.onError(e instanceof Error ? e : new Error("Google sign-in failed"));

@@ -2,7 +2,12 @@ const AUTH_KEY = "haven.auth.v1";
 
 export type LocalUser = {
   email: string;
-  role: "admin";
+  fullName?: string;
+  phone?: string;
+  address?: string;
+  city?: string;
+  country?: string;
+  role: string;
 };
 
 const ADMIN_EMAIL = "deepakjadon1907@gmail.com";
@@ -23,6 +28,11 @@ export function getLocalUser(): LocalUser | null {
   }
 }
 
+export function setLocalUser(user: LocalUser) {
+  if (!isBrowser()) return;
+  window.localStorage.setItem(AUTH_KEY, JSON.stringify(user));
+}
+
 export function signInWithPassword(input: { email: string; password: string }): {
   user: LocalUser | null;
   error: string | null;
@@ -33,7 +43,7 @@ export function signInWithPassword(input: { email: string; password: string }): 
 
   if (email === ADMIN_EMAIL.toLowerCase() && password === ADMIN_PASSWORD) {
     const user: LocalUser = { email: ADMIN_EMAIL, role: "admin" };
-    window.localStorage.setItem(AUTH_KEY, JSON.stringify(user));
+    setLocalUser(user);
     return { user, error: null };
   }
   return { user: null, error: "Invalid admin credentials" };

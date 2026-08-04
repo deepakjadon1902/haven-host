@@ -2,7 +2,6 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { Calendar, Package, Settings, ShoppingCart } from "lucide-react";
 import { adminDashboardStats } from "@/lib/admin.functions";
 import { hotels } from "@/data/hotels";
@@ -41,6 +40,7 @@ function AdminDashboard() {
       bookings: x.count,
     }));
   }, [stats]);
+  const maxBookings = Math.max(1, ...chartData.map((x) => x.bookings));
 
   if (loading) {
     return (
@@ -122,21 +122,20 @@ function AdminDashboard() {
               Trend
             </div>
           </div>
-          <ResponsiveContainer width="100%" height={320}>
-            <BarChart data={chartData}>
-              <CartesianGrid strokeDasharray="4 4" stroke="rgba(0,0,0,0.12)" />
-              <XAxis dataKey="date" stroke="rgba(0,0,0,0.55)" fontSize={12} />
-              <YAxis stroke="rgba(0,0,0,0.55)" allowDecimals={false} fontSize={12} />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: "#fff",
-                  border: "1px solid rgba(0,0,0,0.12)",
-                  borderRadius: 12,
-                }}
-              />
-              <Bar dataKey="bookings" fill="#111111" radius={[10, 10, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
+          <div className="flex h-80 items-end gap-3 border-b border-l border-black/10 px-3 pt-8">
+            {chartData.map((item) => (
+              <div key={item.date} className="flex min-w-0 flex-1 flex-col items-center gap-2">
+                <div className="flex h-60 w-full items-end rounded-t-lg bg-black/[0.03]">
+                  <div
+                    className="w-full rounded-t-lg bg-black transition-[height]"
+                    style={{ height: `${Math.max(6, (item.bookings / maxBookings) * 100)}%` }}
+                    title={`${item.bookings} bookings`}
+                  />
+                </div>
+                <span className="text-[11px] font-medium text-black/55">{item.date}</span>
+              </div>
+            ))}
+          </div>
         </motion.section>
 
         <motion.section

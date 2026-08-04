@@ -4,6 +4,8 @@ import { Room } from "../../models/Room.js";
 import { Settings } from "../../models/Settings.js";
 import { Inventory } from "../../models/Inventory.js";
 import { Booking } from "../../models/Booking.js";
+import { User } from "../../models/User.js";
+import { verifyJwt } from "../../lib/jwt.js";
 import { getFromEmail, getResend } from "../../lib/resend.js";
 
 export const publicRouter = Router();
@@ -104,6 +106,7 @@ publicRouter.post("/bookings", async (req, res) => {
 
   const room = input.room_id ? await Room.findById(input.room_id) : null;
   const roomName = room?.name ?? input.room_type_name;
+  const authUser = await getOptionalAuthUser(req);
 
   const inserted = await Booking.create({
     reference: input.reference ?? makeReference(),
@@ -123,7 +126,22 @@ publicRouter.post("/bookings", async (req, res) => {
     status: input.status ?? "confirmed",
     paymentStatus: input.payment_status ?? "paid",
     paymentReference: input.payment_reference ?? null,
+    userId: authUser?._id ?? null,
   });
+
+  const profileUser = authUser ?? (await User.findOne({ email: input.guest_email }));
+  if (profileUser) {
+    let changed = false;
+    if (!profileUser.fullName && input.guest_full_name) {
+      profileUser.fullName = input.guest_full_name;
+      changed = true;
+    }
+    if (!profileUser.phone && input.guest_phone) {
+      profileUser.phone = input.guest_phone;
+      changed = true;
+    }
+    if (changed) await profileUser.save();
+  }
 
   const resend = getResend();
   if (resend) {
@@ -228,3 +246,15 @@ const bookingCreateSchema = z.object({
   payment_status: z.enum(["unpaid", "paid", "failed"]).optional(),
   payment_reference: z.string().trim().max(120).optional(),
 });
+
+async function getOptionalAuthUser(req) {
+  const header = req.headers.authorization ?? "";
+  const token = header.startsWith("Bearer ") ? header.slice("Bearer ".length) : null;
+  if (!token) return null;
+  try {
+    const payload = verifyJwt(token);
+    return await User.findById(payload.sub);
+  } catch {
+    return null;
+  }
+}

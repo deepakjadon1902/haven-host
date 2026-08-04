@@ -25,6 +25,7 @@ import type { RoomAvailabilityMap, Room } from "@/types/room";
 import { getPublicRoomById, getRoomAvailability } from "@/lib/rooms.functions";
 import { savePaymentDraft } from "@/lib/local-store";
 import { useAppDataRefresh } from "@/hooks/useAppDataRefresh";
+import { useAuth } from "@/hooks/useAuth";
 
 type Search = { hotel?: string; room?: string; date?: string };
 
@@ -72,6 +73,7 @@ const steps = ["Stay", "Guests", "Payment"] as const;
 function BookingPage() {
   const search = Route.useSearch();
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const roomId = search.room;
   const [roomType, setRoomType] = useState<Room | null>(null);
@@ -177,6 +179,16 @@ function BookingPage() {
 
   const adultsArr = useFieldArray({ control: form.control, name: "adults" });
   const childrenArr = useFieldArray({ control: form.control, name: "children" });
+
+  useEffect(() => {
+    if (!user) return;
+    form.reset({
+      ...form.getValues(),
+      fullName: form.getValues("fullName") || user.fullName || "",
+      email: form.getValues("email") || user.email || "",
+      phone: form.getValues("phone") || user.phone || "",
+    });
+  }, [form, user]);
 
   // Sync field arrays with counts
   useEffect(() => {

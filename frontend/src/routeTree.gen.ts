@@ -16,6 +16,7 @@ import { Route as SignupRouteImport } from './routes/signup'
 import { Route as RoomsRouteImport } from './routes/rooms'
 import { Route as RefundPolicyRouteImport } from './routes/refund-policy'
 import { Route as RefundRouteImport } from './routes/refund'
+import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PaymentRouteImport } from './routes/payment'
 import { Route as PartnerRouteImport } from './routes/partner'
@@ -86,6 +87,11 @@ const RefundPolicyRoute = RefundPolicyRouteImport.update({
 const RefundRoute = RefundRouteImport.update({
   id: '/refund',
   path: '/refund',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacyRoute = PrivacyRouteImport.update({
@@ -287,6 +293,7 @@ export interface FileRoutesByFullPath {
   '/partner': typeof PartnerRouteWithChildren
   '/payment': typeof PaymentRoute
   '/privacy': typeof PrivacyRoute
+  '/profile': typeof ProfileRoute
   '/refund': typeof RefundRoute
   '/refund-policy': typeof RefundPolicyRoute
   '/rooms': typeof RoomsRouteWithChildren
@@ -330,6 +337,7 @@ export interface FileRoutesByTo {
   '/offers': typeof OffersRoute
   '/payment': typeof PaymentRoute
   '/privacy': typeof PrivacyRoute
+  '/profile': typeof ProfileRoute
   '/refund': typeof RefundRoute
   '/refund-policy': typeof RefundPolicyRoute
   '/signup': typeof SignupRoute
@@ -375,6 +383,7 @@ export interface FileRoutesById {
   '/partner': typeof PartnerRouteWithChildren
   '/payment': typeof PaymentRoute
   '/privacy': typeof PrivacyRoute
+  '/profile': typeof ProfileRoute
   '/refund': typeof RefundRoute
   '/refund-policy': typeof RefundPolicyRoute
   '/rooms': typeof RoomsRouteWithChildren
@@ -422,6 +431,7 @@ export interface FileRouteTypes {
     | '/partner'
     | '/payment'
     | '/privacy'
+    | '/profile'
     | '/refund'
     | '/refund-policy'
     | '/rooms'
@@ -465,6 +475,7 @@ export interface FileRouteTypes {
     | '/offers'
     | '/payment'
     | '/privacy'
+    | '/profile'
     | '/refund'
     | '/refund-policy'
     | '/signup'
@@ -509,6 +520,7 @@ export interface FileRouteTypes {
     | '/partner'
     | '/payment'
     | '/privacy'
+    | '/profile'
     | '/refund'
     | '/refund-policy'
     | '/rooms'
@@ -555,6 +567,7 @@ export interface RootRouteChildren {
   PartnerRoute: typeof PartnerRouteWithChildren
   PaymentRoute: typeof PaymentRoute
   PrivacyRoute: typeof PrivacyRoute
+  ProfileRoute: typeof ProfileRoute
   RefundRoute: typeof RefundRoute
   RefundPolicyRoute: typeof RefundPolicyRoute
   RoomsRoute: typeof RoomsRouteWithChildren
@@ -616,6 +629,13 @@ declare module '@tanstack/react-router' {
       path: '/refund'
       fullPath: '/refund'
       preLoaderRoute: typeof RefundRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacy': {
@@ -958,6 +978,7 @@ const rootRouteChildren: RootRouteChildren = {
   PartnerRoute: PartnerRouteWithChildren,
   PaymentRoute: PaymentRoute,
   PrivacyRoute: PrivacyRoute,
+  ProfileRoute: ProfileRoute,
   RefundRoute: RefundRoute,
   RefundPolicyRoute: RefundPolicyRoute,
   RoomsRoute: RoomsRouteWithChildren,

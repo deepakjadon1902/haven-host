@@ -1,4 +1,5 @@
 import { apiFetch, hasApiBase } from "@/lib/api-client";
+import { getUserToken } from "@/lib/user-session";
 import {
   createBooking as localCreateBooking,
   listBookingsByEmail as localListByEmail,
@@ -13,6 +14,7 @@ export async function createBooking(
     const booking = await apiFetch<LocalBooking>("/public/bookings", {
       method: "POST",
       json: input,
+      token: getUserToken(),
     });
     emitAppDataChanged("public:bookings:create");
     return booking;

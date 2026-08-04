@@ -188,4 +188,31 @@
     background: color-mix(in oklab, var(--gold-light) 28%, white);
     color: color-mix(in oklab, var(--gold) 78%, black);
   }
+
+  .profile-input {
+    height: 3rem;
+    width: 100%;
+    border-radius: 0.5rem;
+    border: 1px solid color-mix(in oklab, black 12%, transparent);
+    background: white;
+    padding-inline: 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: black;
+    outline: none;
+    transition:
+      border-color 160ms ease,
+      box-shadow 160ms ease,
+      background 160ms ease;
+  }
+
+  .profile-input:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--gold) 16%, transparent);
+  }
+
+  .profile-input:disabled {
+    cursor: default;
+    color: color-mix(in oklab, black 72%, transparent);
+  }
 }

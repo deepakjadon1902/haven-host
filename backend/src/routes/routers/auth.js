@@ -5,11 +5,50 @@ import { OAuth2Client } from "google-auth-library";
 
 import { Otp } from "../../models/Otp.js";
 import { User } from "../../models/User.js";
+import { Booking } from "../../models/Booking.js";
 import { signJwt } from "../../lib/jwt.js";
 import { getEnv } from "../../lib/env.js";
 import { getFromEmail, getResend } from "../../lib/resend.js";
+import { requireAuth } from "../../middleware/auth.js";
 
 export const authRouter = Router();
+
+function serializeUser(user) {
+  return {
+    id: String(user._id),
+    email: user.email,
+    fullName: user.fullName ?? "",
+    phone: user.phone ?? "",
+    address: user.address ?? "",
+    city: user.city ?? "",
+    country: user.country ?? "",
+    role: user.role,
+  };
+}
+
+function toBookingDto(b) {
+  return {
+    id: String(b._id),
+    reference: b.reference,
+    hotel_name: b.hotelName,
+    room_type_name: b.roomTypeName,
+    room_id: b.roomId ? String(b.roomId) : null,
+    check_in: b.checkIn,
+    check_out: b.checkOut,
+    nights: b.nights,
+    adults: b.adults,
+    children: b.children,
+    guest_full_name: b.guestFullName,
+    guest_email: b.guestEmail,
+    guest_phone: b.guestPhone,
+    total_cents: b.totalCents,
+    currency: b.currency,
+    status: b.status,
+    created_at: b.createdAt?.toISOString?.() ?? new Date(b.createdAt).toISOString(),
+    payment_status: b.paymentStatus,
+    payment_reference: b.paymentReference,
+  };
+}
 
 function randomOtpCode() {
   return String(Math.floor(100000 + Math.random() * 900000));
@@ -81,7 +120,7 @@ authRouter.post("/verify-otp", async (req, res) => {
   }
 
   const token = signJwt({ sub: String(user._id), email: user.email, role: user.role });
-  res.json({ token, user: { id: String(user._id), email: user.email, role: user.role } });
+  res.json({ token, user: serializeUser(user) });
 });
 
 authRouter.post("/admin/login", async (req, res) => {
@@ -112,7 +151,7 @@ authRouter.post("/admin/login", async (req, res) => {
   }
 
   const token = signJwt({ sub: String(admin._id), email: admin.email, role: "admin" });
-  res.json({ token, user: { id: String(admin._id), email: admin.email, role: "admin" } });
+  res.json({ token, user: serializeUser(admin) });
 });
 
 authRouter.post("/google", async (req, res) => {
@@ -149,5 +188,73 @@ authRouter.post("/google", async (req, res) => {
   }
 
   const token = signJwt({ sub: String(user._id), email: user.email, role: user.role });
-  res.json({ token, user: { id: String(user._id), email: user.email, role: user.role } });
+  res.json({ token, user: serializeUser(user) });
+});
+
+authRouter.get("/me", requireAuth, async (req, res) => {
+  const user = await User.findById(req.user.sub);
+  if (!user) {
+    const err = new Error("User not found");
+    err.status = 404;
+    throw err;
+  }
+  if (!user.fullName || !user.phone) {
+    const latestBooking = await Booking.findOne({
+      $or: [{ userId: user._id }, { guestEmail: user.email }],
+    })
+      .sort({ createdAt: -1 })
+      .lean();
+    if (latestBooking) {
+      if (!user.fullName) user.fullName = latestBooking.guestFullName;
+      if (!user.phone) user.phone = latestBooking.guestPhone;
+      await user.save();
+    }
+  }
+  res.json({ user: serializeUser(user) });
+});
+
+authRouter.put("/me", requireAuth, async (req, res) => {
+  const input = z
+    .object({
+      fullName: z.string().trim().min(2).max(120),
+      phone: z.string().trim().max(40).optional().default(""),
+      address: z.string().trim().max(240).optional().default(""),
+      city: z.string().trim().max(120).optional().default(""),
+      country: z.string().trim().max(120).optional().default(""),
+    })
+    .parse(req.body);
+
+  const user = await User.findById(req.user.sub);
+  if (!user) {
+    const err = new Error("User not found");
+    err.status = 404;
+    throw err;
+  }
+
+  user.fullName = input.fullName;
+  user.phone = input.phone;
+  user.address = input.address;
+  user.city = input.city;
+  user.country = input.country;
+  await user.save();
+
+  res.json({ user: serializeUser(user) });
+});
+
+authRouter.get("/me/bookings", requireAuth, async (req, res) => {
+  const user = await User.findById(req.user.sub).lean();
+  if (!user) {
+    const err = new Error("User not found");
+    err.status = 404;
+    throw err;
+  }
+
+  const rows = await Booking.find({
+    $or: [{ userId: user._id }, { guestEmail: user.email }],
+  })
+    .sort({ createdAt: -1 })
+    .limit(200)
+    .lean();
+
+  res.json({ bookings: rows.map(toBookingDto) });
 });

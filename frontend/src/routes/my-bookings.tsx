@@ -5,6 +5,8 @@ import { SiteLayout } from "@/components/site/SiteLayout";
 import { Button } from "@/components/ui/button";
 import { getLastBookingEmail, type LocalBooking } from "@/lib/local-store";
 import { listBookingsByEmail } from "@/lib/bookings.functions";
+import { useAuth } from "@/hooks/useAuth";
+import { listCurrentUserBookings } from "@/lib/profile.functions";
 
 export const Route = createFileRoute("/my-bookings")({
   head: () => ({
@@ -19,12 +21,13 @@ function formatInr(cents: number) {
 }
 
 function MyBookingsPage() {
+  const { user } = useAuth();
   const [email, setEmail] = useState("");
   const [rows, setRows] = useState<LocalBooking[]>([]);
 
   useEffect(() => {
-    setEmail(getLastBookingEmail());
-  }, []);
+    setEmail(user?.email ?? getLastBookingEmail());
+  }, [user?.email]);
 
   useEffect(() => {
     if (!email.trim()) {
@@ -33,13 +36,15 @@ function MyBookingsPage() {
     }
     let cancelled = false;
     (async () => {
-      const next = await listBookingsByEmail(email);
+      const next = user
+        ? await listCurrentUserBookings(user.email)
+        : await listBookingsByEmail(email);
       if (!cancelled) setRows(next);
     })();
     return () => {
       cancelled = true;
     };
-  }, [email]);
+  }, [email, user]);
 
   const sorted = useMemo(() => {
     return rows.slice().sort((a, b) => (a.created_at < b.created_at ? 1 : -1));

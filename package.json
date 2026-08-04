@@ -2,11 +2,17 @@
   "name": "haven-host",
   "private": true,
   "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "dev:frontend": "npm run dev --workspace frontend",
+    "dev:backend": "npm run dev --workspace backend",
     "build": "npm run build --workspace frontend",
     "lint": "npm run lint --workspace frontend",
     "typecheck": "npm exec --workspace frontend -- tsc --noEmit",
     "check:backend": "node --check backend/src/index.js",
     "check": "npm run typecheck && npm run build && npm run lint && npm run check:backend"
+  },
+  "devDependencies": {
+    "vite": "^7.3.1"
   },
   "workspaces": [
     "frontend",
