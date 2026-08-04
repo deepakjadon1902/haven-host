@@ -14,6 +14,9 @@ const envSchema = z.object({
   RESEND_FROM_EMAIL: z.string().optional(),
   APP_BASE_URL: z.string().optional(),
   API_BASE_URL: z.string().optional(),
+  FRONTEND_URL: z.string().optional(),
+  BACKEND_URL: z.string().optional(),
+  CORS_ORIGINS: z.string().optional(),
 });
 
 export function getEnv() {

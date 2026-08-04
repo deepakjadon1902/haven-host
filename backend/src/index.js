@@ -8,17 +8,42 @@ import helmet from "helmet";
 import morgan from "morgan";
 
 import { connectMongo } from "./lib/mongo.js";
+import { getEnv } from "./lib/env.js";
 import { registerRoutes } from "./routes/index.js";
 import { errorMiddleware, notFoundMiddleware } from "./middleware/errors.js";
 import { seedIfEmpty } from "./seed/seed.js";
 
 const app = express();
+const env = getEnv();
+
+const defaultAllowedOrigins = [
+  "http://localhost:5173",
+  "https://haven-host-frontend-5etw.vercel.app",
+];
+
+const allowedOrigins = new Set(
+  [
+    ...defaultAllowedOrigins,
+    env.APP_BASE_URL,
+    env.FRONTEND_URL,
+    ...(env.CORS_ORIGINS ?? "").split(","),
+  ]
+    .map((origin) => origin?.trim())
+    .filter(Boolean),
+);
 
 app.set("trust proxy", true);
 app.use(helmet());
 app.use(
   cors({
-    origin: true,
+    origin(origin, callback) {
+      if (!origin || allowedOrigins.has(origin)) {
+        callback(null, true);
+        return;
+      }
+
+      callback(new Error(`CORS blocked origin: ${origin}`));
+    },
     credentials: true,
   }),
 );

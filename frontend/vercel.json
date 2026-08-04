@@ -1,5 +1,11 @@
 {
   "framework": "tanstack-start",
   "installCommand": "npm install --no-audit --no-fund",
-  "buildCommand": "npm run build"
+  "buildCommand": "npm run build",
+  "env": {
+    "VITE_FRONTEND_URL": "https://haven-host-frontend-5etw.vercel.app",
+    "VITE_BACKEND_URL": "https://haven-host.onrender.com",
+    "VITE_API_BASE_URL": "https://haven-host.onrender.com/api",
+    "VITE_GOOGLE_CLIENT_ID": "655716971183-94i1trm3ia2jabqg5j1vp2vjc7gcb7fi.apps.googleusercontent.com"
+  }
 }
