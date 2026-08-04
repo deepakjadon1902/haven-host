@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: haven-host
+    runtime: node
+    plan: free
+    buildCommand: npm install --no-audit --no-fund
+    startCommand: npm run start --workspace backend
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: APP_BASE_URL
+        value: https://haven-host-frontend-5etw.vercel.app
+      - key: API_BASE_URL
+        value: https://haven-host.onrender.com
+      - key: FRONTEND_URL
+        value: https://haven-host-frontend-5etw.vercel.app
+      - key: BACKEND_URL
+        value: https://haven-host.onrender.com
+      - key: CORS_ORIGINS
+        value: https://haven-host-frontend-5etw.vercel.app
+      - key: MONGODB_USE_MEMORY
+        value: "false"

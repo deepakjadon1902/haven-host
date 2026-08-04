@@ -5,6 +5,8 @@
     "dev": "node scripts/dev.mjs",
     "dev:frontend": "npm run dev --workspace frontend",
     "dev:backend": "npm run dev --workspace backend",
+    "start": "npm run start --workspace backend",
+    "start:backend": "npm run start --workspace backend",
     "build": "npm run build --workspace frontend",
     "lint": "npm run lint --workspace frontend",
     "typecheck": "npm exec --workspace frontend -- tsc --noEmit",
