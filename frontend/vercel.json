@@ -1,0 +1,5 @@
+{
+  "installCommand": "npm install --no-audit",
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist/client"
+}
