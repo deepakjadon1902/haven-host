@@ -17,6 +17,9 @@ const envSchema = z.object({
   FRONTEND_URL: z.string().optional(),
   BACKEND_URL: z.string().optional(),
   CORS_ORIGINS: z.string().optional(),
+  RAZORPAY_KEY_ID: z.string().optional(),
+  RAZORPAY_KEY_SECRET: z.string().optional(),
+  RAZORPAY_WEBHOOK_SECRET: z.string().optional(),
 });
 
 export function getEnv() {

@@ -12,21 +12,29 @@ import {
 } from "@/lib/local-store";
 import { apiFetch, hasApiBase } from "@/lib/api-client";
 
+const PUBLIC_API_TIMEOUT_MS = 180;
+
+function mergeRooms(localRooms: Room[], apiRooms: Room[]) {
+  const seen = new Set<string>();
+  return [...localRooms, ...apiRooms]
+    .filter((room) => {
+      const key = room.id || room.slug;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return !room.hotelId || isPartnerHotelActive(room.hotelId);
+    })
+    .filter((room) => room.active);
+}
+
 export async function listPublicRooms(): Promise<Room[]> {
   ensureSeeded();
   const localRooms = listVisibleRooms();
   if (hasApiBase()) {
     try {
-      const apiRooms = await apiFetch<Room[]>("/public/rooms");
-      const seen = new Set<string>();
-      return [...localRooms, ...apiRooms]
-        .filter((room) => {
-          const key = room.id || room.slug;
-          if (seen.has(key)) return false;
-          seen.add(key);
-          return !room.hotelId || isPartnerHotelActive(room.hotelId);
-        })
-        .filter((room) => room.active);
+      const apiRooms = await apiFetch<Room[]>("/public/rooms", {
+        timeoutMs: PUBLIC_API_TIMEOUT_MS,
+      });
+      return mergeRooms(localRooms, apiRooms);
     } catch {
       return localRooms;
     }
@@ -61,7 +69,7 @@ export async function getPublicRoomById(input: { id: string }): Promise<Room | n
   if (localRoom && localRoom.active && isPartnerHotelActive(localRoom.hotelId)) return localRoom;
   if (localRoom?.hotelId && !isPartnerHotelActive(localRoom.hotelId)) return null;
   if (hasApiBase()) {
-    const rooms = await apiFetch<Room[]>("/public/rooms");
+    const rooms = await apiFetch<Room[]>("/public/rooms", { timeoutMs: PUBLIC_API_TIMEOUT_MS });
     return rooms.find((r) => r.id === input.id) ?? null;
   }
   return null;
@@ -80,14 +88,23 @@ export async function getRoomAvailability(input: {
   from: string;
   days: number;
 }): Promise<RoomAvailabilityMap> {
+  ensureSeeded();
+  const localRoom = getRoomById(input.roomId);
+  if (localRoom) return localAvailability(input.roomId, input.from, input.days);
+
   if (hasApiBase()) {
     const qs = new URLSearchParams({
       roomId: input.roomId,
       from: input.from,
       days: String(input.days),
     });
-    return await apiFetch<RoomAvailabilityMap>(`/public/availability?${qs.toString()}`);
+    try {
+      return await apiFetch<RoomAvailabilityMap>(`/public/availability?${qs.toString()}`, {
+        timeoutMs: PUBLIC_API_TIMEOUT_MS,
+      });
+    } catch {
+      return { available: {}, blocked: {} };
+    }
   }
-  ensureSeeded();
   return localAvailability(input.roomId, input.from, input.days);
 }

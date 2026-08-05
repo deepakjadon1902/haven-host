@@ -36,7 +36,7 @@ export const Route = createFileRoute("/")({
 function HomePage() {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [loading, setLoading] = useState(true);
-  const dataRefreshVersion = useAppDataRefresh(5_000);
+  const dataRefreshVersion = useAppDataRefresh(0);
 
   useEffect(() => {
     const load = async () => {

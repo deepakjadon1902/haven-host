@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { z } from "zod";
+import mongoose from "mongoose";
 import { Room } from "../../models/Room.js";
 import { Settings } from "../../models/Settings.js";
 import { Inventory } from "../../models/Inventory.js";
@@ -37,6 +38,11 @@ publicRouter.get("/availability", async (req, res) => {
       days: z.coerce.number().int().min(1).max(365),
     })
     .parse(req.query);
+
+  if (!mongoose.Types.ObjectId.isValid(input.roomId)) {
+    res.json({ available: {}, blocked: {} });
+    return;
+  }
 
   const room = await Room.findById(input.roomId);
   if (!room) {
@@ -104,7 +110,10 @@ publicRouter.get("/bookings/:id", async (req, res) => {
 publicRouter.post("/bookings", async (req, res) => {
   const input = bookingCreateSchema.parse(req.body);
 
-  const room = input.room_id ? await Room.findById(input.room_id) : null;
+  const room =
+    input.room_id && mongoose.Types.ObjectId.isValid(input.room_id)
+      ? await Room.findById(input.room_id)
+      : null;
   const roomName = room?.name ?? input.room_type_name;
   const authUser = await getOptionalAuthUser(req);
 
@@ -123,13 +132,14 @@ publicRouter.post("/bookings", async (req, res) => {
     guestPhone: input.guest_phone,
     totalCents: input.total_cents,
     currency: input.currency ?? "INR",
-    status: input.status ?? "confirmed",
-    paymentStatus: input.payment_status ?? "paid",
-    paymentReference: input.payment_reference ?? null,
+    status: "pending",
+    paymentStatus: "unpaid",
+    paymentReference: null,
     userId: authUser?._id ?? null,
   });
 
-  const profileUser = authUser ?? (await User.findOne({ email: input.guest_email }));
+  const profileUser =
+    authUser ?? (await User.findOne({ email: input.guest_email }));
   if (profileUser) {
     let changed = false;
     if (!profileUser.fullName && input.guest_full_name) {
@@ -249,7 +259,9 @@ const bookingCreateSchema = z.object({
 
 async function getOptionalAuthUser(req) {
   const header = req.headers.authorization ?? "";
-  const token = header.startsWith("Bearer ") ? header.slice("Bearer ".length) : null;
+  const token = header.startsWith("Bearer ")
+    ? header.slice("Bearer ".length)
+    : null;
   if (!token) return null;
   try {
     const payload = verifyJwt(token);

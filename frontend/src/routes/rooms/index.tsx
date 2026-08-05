@@ -36,7 +36,7 @@ function RoomsPage() {
   const [loading, setLoading] = useState(true);
   const [selectedFilter, setSelectedFilter] = useState<"all" | "active">("active");
   const selectedHotel = search.hotel ? findHotel(search.hotel) : undefined;
-  const dataRefreshVersion = useAppDataRefresh(5_000);
+  const dataRefreshVersion = useAppDataRefresh(0);
 
   useEffect(() => {
     const load = async () => {

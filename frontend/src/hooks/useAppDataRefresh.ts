@@ -16,13 +16,13 @@ export function useAppDataRefresh(intervalMs = 10_000) {
     window.addEventListener("focus", onFocus);
     document.addEventListener("visibilitychange", onVisibilityChange);
 
-    const timer = window.setInterval(refresh, intervalMs);
+    const timer = intervalMs > 0 ? window.setInterval(refresh, intervalMs) : undefined;
 
     return () => {
       unsubscribe();
       window.removeEventListener("focus", onFocus);
       document.removeEventListener("visibilitychange", onVisibilityChange);
-      window.clearInterval(timer);
+      if (timer) window.clearInterval(timer);
     };
   }, [intervalMs]);
 

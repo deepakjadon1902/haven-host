@@ -49,7 +49,16 @@ app.use(
     credentials: true,
   }),
 );
-app.use(express.json({ limit: "2mb" }));
+app.use(
+  express.json({
+    limit: "2mb",
+    verify(req, _res, buf) {
+      if (req.originalUrl === "/api/payments/razorpay/webhook") {
+        req.rawBody = buf;
+      }
+    },
+  }),
+);
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan("dev"));
 
@@ -106,4 +115,3 @@ main().catch((err) => {
   console.error(err);
   process.exit(1);
 });
-

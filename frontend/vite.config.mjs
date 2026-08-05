@@ -7,6 +7,7 @@ import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import { nitro } from "nitro/vite";
 
 const appRoot = path.dirname(fileURLToPath(import.meta.url));
+const workspaceRoot = path.dirname(appRoot);
 
 function windowsDevOptimizerGuard() {
   return {
@@ -63,8 +64,8 @@ export default defineConfig({
       },
     },
     fs: {
-      // Avoid Vite scanning parent directories for workspace root on locked-down Windows profiles.
-      allow: [appRoot],
+      // Keep filesystem access scoped while allowing hoisted workspace dependencies.
+      allow: [appRoot, workspaceRoot],
     },
   },
 });

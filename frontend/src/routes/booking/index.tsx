@@ -88,7 +88,7 @@ function BookingPage() {
   );
   const [availability, setAvailability] = useState<RoomAvailabilityMap | null>(null);
   const [availabilityLoading, setAvailabilityLoading] = useState(false);
-  const dataRefreshVersion = useAppDataRefresh(5_000);
+  const dataRefreshVersion = useAppDataRefresh(0);
   const roomTypeId = roomType?.id;
 
   const maxAdults = roomType?.maxAdults ?? 2;
@@ -556,7 +556,11 @@ function BookingPage() {
 
           <aside className="lg:sticky lg:top-28 self-start">
             <div className="rounded-3xl border border-black/10 overflow-hidden bg-white">
-              <img src={roomType.coverImage} alt="" className="aspect-[4/3] w-full object-cover" />
+              <img
+                src={roomType.coverImage}
+                alt=""
+                className="aspect-[16/9] max-h-[280px] w-full object-cover"
+              />
               <div className="p-6">
                 <p className="text-xs uppercase tracking-widest text-gold font-semibold">
                   Maison Noir

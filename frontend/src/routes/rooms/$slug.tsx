@@ -1,6 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { motion } from "framer-motion";
-import { ArrowLeft, ArrowRight, Bed, MapPin, PawPrint, Users } from "lucide-react";
+import { ArrowLeft, ArrowRight, Bed, MapPin, PawPrint, Ruler, Users } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { SiteLayout } from "@/components/site/SiteLayout";
@@ -43,7 +43,7 @@ function RoomDetailPage() {
   const [loading, setLoading] = useState(true);
   const [availability, setAvailability] = useState<RoomAvailabilityMap | null>(null);
   const [availabilityLoading, setAvailabilityLoading] = useState(false);
-  const dataRefreshVersion = useAppDataRefresh(5_000);
+  const dataRefreshVersion = useAppDataRefresh(0);
   const roomId = room?.id;
 
   const isNotFoundError = (err: unknown): err is { isNotFound: true } =>
@@ -102,7 +102,7 @@ function RoomDetailPage() {
 
   return (
     <SiteLayout>
-      <div className="mx-auto max-w-7xl px-5 py-10 lg:px-8 lg:py-14">
+      <div className="mx-auto max-w-6xl px-5 py-8 lg:px-8 lg:py-10">
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
           <Link
             to="/rooms"
@@ -113,20 +113,20 @@ function RoomDetailPage() {
           </Link>
         </motion.div>
 
-        <div className="mt-8 grid gap-10 lg:grid-cols-[1.5fr_1fr] lg:gap-16">
+        <div className="mt-6 grid items-start gap-7 lg:grid-cols-[minmax(0,1fr)_420px] lg:gap-10">
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
-            <div className="relative mb-6 aspect-[4/3] overflow-hidden rounded-3xl border border-black/10 bg-gray-50">
+            <div className="relative mb-5 aspect-[16/9] max-h-[340px] overflow-hidden rounded-2xl border border-black/10 bg-gray-50">
               {room.coverImage ? (
                 <img src={room.coverImage} alt={room.name} className="h-full w-full object-cover" />
               ) : null}
             </div>
 
             {room.images.length > 1 ? (
-              <div className="mb-8 grid grid-cols-3 gap-4">
+              <div className="mb-6 grid grid-cols-3 gap-3">
                 {room.images.slice(0, 3).map((img, i) => (
                   <div
                     key={i}
-                    className="aspect-square overflow-hidden rounded-xl border border-black/10 bg-gray-50"
+                    className="aspect-[4/3] overflow-hidden rounded-xl border border-black/10 bg-gray-50"
                   >
                     <img
                       src={img}
@@ -138,9 +138,9 @@ function RoomDetailPage() {
               </div>
             ) : null}
 
-            <div className="space-y-6">
+            <div className="space-y-5">
               <div>
-                <h1 className="font-display text-4xl font-semibold text-black md:text-5xl">
+                <h1 className="font-display text-3xl font-semibold text-black md:text-4xl">
                   {room.name}
                 </h1>
                 {room.hotelName ? (
@@ -153,9 +153,9 @@ function RoomDetailPage() {
                 <p className="mt-3 text-sm text-gray-700">{room.description}</p>
               </div>
 
-              <div className="rounded-2xl border border-black/10 bg-white p-8">
+              <div className="rounded-2xl border border-black/10 bg-white p-6">
                 <h3 className="font-display text-xl font-semibold text-black">Room Features</h3>
-                <div className="mt-4 grid grid-cols-2 gap-4 text-sm text-black">
+                <div className="mt-4 grid grid-cols-2 gap-3 text-sm text-black">
                   {room.bedType ? (
                     <div className="flex items-center gap-3">
                       <Bed className="h-5 w-5 text-gold" />
@@ -177,7 +177,7 @@ function RoomDetailPage() {
                   ) : null}
                   {room.size ? (
                     <div className="flex items-center gap-3">
-                      <span className="text-gold">{"\uD83D\uDCCF"}</span>
+                      <Ruler className="h-5 w-5 text-gold" />
                       <span>{room.size}</span>
                     </div>
                   ) : null}
@@ -185,7 +185,7 @@ function RoomDetailPage() {
               </div>
 
               {room.amenities.length > 0 ? (
-                <div className="rounded-2xl border border-black/10 bg-white p-8">
+                <div className="rounded-2xl border border-black/10 bg-white p-6">
                   <h3 className="mb-4 font-display text-xl font-semibold text-black">Amenities</h3>
                   <div className="grid grid-cols-2 gap-3">
                     {room.amenities.map((amenity) => (
@@ -205,18 +205,18 @@ function RoomDetailPage() {
             animate={{ opacity: 1, x: 0 }}
             className="h-fit lg:sticky lg:top-24"
           >
-            <div className="rounded-3xl border border-black/10 bg-white p-8">
+            <div className="rounded-2xl border border-black/10 bg-white p-6">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-widest text-gray-700">
                   Per night
                 </p>
-                <p className="mt-2 font-display text-4xl font-semibold text-black">
+                <p className="mt-2 font-display text-3xl font-semibold text-black">
                   {"\u20B9"}
                   {room.pricePerNight.toLocaleString("en-IN")}
                 </p>
               </div>
 
-              <div className="mt-6 rounded-2xl border border-black/10 bg-gray-50 p-4">
+              <div className="mt-5 rounded-2xl border border-black/10 bg-gray-50 p-4">
                 <p className="text-sm font-semibold text-black">Availability (next 30 days)</p>
                 {availabilityLoading ? (
                   <p className="mt-2 text-sm text-gray-700">Loading availability…</p>
@@ -258,13 +258,13 @@ function RoomDetailPage() {
                 </div>
               </div>
 
-              <Button asChild size="lg" className="mt-6 h-12 w-full rounded-xl font-semibold">
+              <Button asChild size="lg" className="mt-5 h-12 w-full rounded-xl font-semibold">
                 <Link to="/booking" search={{ room: room.id, date: todayIso() } as never}>
                   Book Now <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
 
-              <div className="mt-6 space-y-2 border-t border-black/10 pt-4 text-xs text-gray-700">
+              <div className="mt-5 space-y-2 border-t border-black/10 pt-4 text-xs text-gray-700">
                 <p>{"\u2713"} Calendar-aligned availability</p>
                 <p>{"\u2713"} Maintenance/closed blocks applied</p>
                 <p>{"\u2713"} Transparent pricing</p>
