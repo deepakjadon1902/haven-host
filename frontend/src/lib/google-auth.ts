@@ -111,22 +111,6 @@ export async function renderGoogleButton(opts: {
         try {
           const credential = response?.credential;
           if (!credential) throw new Error("Missing Google credential");
-          if (hasApiBase()) {
-            try {
-              const result = await apiFetch<{ token: string; user: AppUser }>("/auth/google", {
-                method: "POST",
-                json: { credential },
-                timeoutMs: 4000,
-              });
-              setUserToken(result.token);
-              setStoredUser(result.user);
-              opts.onSuccess(result);
-              return;
-            } catch {
-              // Keep Google auth usable in the local demo when the backend is offline.
-            }
-          }
-
           const profile = decodeGoogleCredential(credential);
           if (!profile?.email) throw friendlyGoogleError();
           const local = upsertGoogleLocalUser({
@@ -137,6 +121,21 @@ export async function renderGoogleButton(opts: {
           const user = toAppUser(local.user);
           setStoredUser(user);
           opts.onSuccess({ token: "", user });
+
+          if (hasApiBase()) {
+            apiFetch<{ token: string; user: AppUser }>("/auth/google", {
+              method: "POST",
+              json: { credential },
+              timeoutMs: 5000,
+            })
+              .then((result) => {
+                setUserToken(result.token);
+                setStoredUser(result.user);
+              })
+              .catch(() => {
+                // The deployed frontend should remain signed in even if the API is cold/offline.
+              });
+          }
         } catch (e) {
           opts.onError(e instanceof Error ? e : friendlyGoogleError());
         }
