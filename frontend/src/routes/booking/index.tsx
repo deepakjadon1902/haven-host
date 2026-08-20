@@ -18,6 +18,8 @@ import {
   Calendar,
   Plus,
   Minus,
+  ShieldCheck,
+  Smartphone,
 } from "lucide-react";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { Button } from "@/components/ui/button";
@@ -60,10 +62,6 @@ const schema = z.object({
   pets: z.enum(["yes", "no"]),
   adults: z.array(guestSchema).min(1, "At least one adult required"),
   children: z.array(guestSchema),
-  cardName: z.string().min(2).max(80),
-  cardNumber: z.string().regex(/^[0-9 ]{12,19}$/, "16-digit number"),
-  cardExpiry: z.string().regex(/^(0[1-9]|1[0-2])\/\d{2}$/, "MM/YY"),
-  cardCvc: z.string().regex(/^\d{3,4}$/, "3-4 digits"),
 });
 
 type FormValues = z.infer<typeof schema>;
@@ -170,10 +168,6 @@ function BookingPage() {
       pets: "no",
       adults: Array.from({ length: 2 }, () => ({ name: "", age: 30, gender: "male" as const })),
       children: [],
-      cardName: "",
-      cardNumber: "",
-      cardExpiry: "",
-      cardCvc: "",
     },
   });
 
@@ -467,56 +461,41 @@ function BookingPage() {
                     className="space-y-6"
                   >
                     <Section title="Payment method">
-                      <div className="flex flex-wrap gap-2 mb-5">
-                        {["Card", "UPI", "Razorpay", "PayPal", "Wallet"].map((p, i) => (
-                          <span
-                            key={p}
-                            className={`px-4 h-10 rounded-full border text-sm font-semibold inline-flex items-center ${
-                              i === 0
-                                ? "bg-gold text-black border-gold"
-                                : "border-black/15 text-black/70"
-                            }`}
-                          >
-                            {p}
+                      <div className="rounded-2xl border border-gold/35 bg-gold/10 p-5">
+                        <div className="flex flex-wrap items-center justify-between gap-4">
+                          <div className="flex items-center gap-3">
+                            <span className="grid h-11 w-11 place-items-center rounded-xl bg-white text-gold shadow-sm">
+                              <Smartphone className="h-5 w-5" />
+                            </span>
+                            <div>
+                              <p className="text-xs font-semibold uppercase tracking-widest text-gray-700">
+                                Online payment gateway
+                              </p>
+                              <h4 className="font-display text-xl font-semibold text-black">
+                                Razorpay Checkout
+                              </h4>
+                            </div>
+                          </div>
+                          <span className="inline-flex h-9 items-center rounded-full bg-black px-4 text-sm font-semibold text-white">
+                            Only payment method
                           </span>
-                        ))}
+                        </div>
+                        <div className="mt-5 grid gap-3 sm:grid-cols-3">
+                          {["UPI", "Cards", "Netbanking"].map((item) => (
+                            <div
+                              key={item}
+                              className="flex h-11 items-center justify-center rounded-xl border border-black/10 bg-white text-sm font-semibold text-black"
+                            >
+                              {item}
+                            </div>
+                          ))}
+                        </div>
+                        <p className="mt-4 flex items-start gap-2 text-xs leading-relaxed text-gray-700">
+                          <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-gold" />
+                          You will continue to the official Razorpay checkout. Booking is confirmed
+                          after payment verification succeeds.
+                        </p>
                       </div>
-                      <Field label="Name on card" error={form.formState.errors.cardName?.message}>
-                        <input
-                          className={inputCls}
-                          placeholder="As printed on card"
-                          {...form.register("cardName")}
-                        />
-                      </Field>
-                      <Field label="Card number" error={form.formState.errors.cardNumber?.message}>
-                        <input
-                          className={inputCls}
-                          placeholder="4242 4242 4242 4242"
-                          {...form.register("cardNumber")}
-                        />
-                      </Field>
-                      <Grid>
-                        <Field
-                          label="Expiry (MM/YY)"
-                          error={form.formState.errors.cardExpiry?.message}
-                        >
-                          <input
-                            className={inputCls}
-                            placeholder="08/28"
-                            {...form.register("cardExpiry")}
-                          />
-                        </Field>
-                        <Field label="CVC" error={form.formState.errors.cardCvc?.message}>
-                          <input
-                            className={inputCls}
-                            placeholder="123"
-                            {...form.register("cardCvc")}
-                          />
-                        </Field>
-                      </Grid>
-                      <p className="text-xs text-gray-700">
-                        This is a demo. No real charges are made.
-                      </p>
                     </Section>
                   </motion.section>
                 )}

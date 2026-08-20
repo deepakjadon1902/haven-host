@@ -69,10 +69,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const refreshUser = useCallback(async () => {
     const token = getUserToken();
     if (hasApiBase() && token) {
-      const result = await apiFetch<{ user: AppUser }>("/auth/me", { token });
-      setStoredUser(result.user);
-      setUser(result.user);
-      return result.user;
+      try {
+        const result = await apiFetch<{ user: AppUser }>("/auth/me", { token, timeoutMs: 4000 });
+        setStoredUser(result.user);
+        setUser(result.user);
+        return result.user;
+      } catch {
+        // Stale or unreachable backend sessions should not break local demo auth.
+      }
     }
     const local = getStoredUser() ?? toAppUser(getLocalUser());
     setUser(local);
@@ -121,6 +125,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           const apiRes = await apiFetch<{ token: string; user: LocalUser }>("/auth/admin/login", {
             method: "POST",
             json: input,
+            timeoutMs: 4000,
           });
           const adminUser: AppUser = {
             id: apiRes.user.email,
@@ -146,6 +151,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           const apiRes = await apiFetch<{ token: string }>("/auth/admin/login", {
             method: "POST",
             json: input,
+            timeoutMs: 4000,
           });
           setAdminToken(apiRes.token);
         } catch {

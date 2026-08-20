@@ -142,7 +142,7 @@ function Hero() {
             <select
               value={hotel}
               onChange={(e) => setHotel(e.target.value)}
-              className="w-full bg-transparent text-sm font-medium text-white outline-none [color-scheme:dark]"
+              className="w-full bg-transparent text-sm font-medium text-white outline-none"
             >
               <option value="">All hotels</option>
               {hotels.map((h) => (
@@ -156,7 +156,7 @@ function Hero() {
             <select
               value={String(guests)}
               onChange={(e) => setGuests(Number(e.target.value))}
-              className="w-full bg-transparent text-sm font-medium text-white outline-none [color-scheme:dark]"
+              className="w-full bg-transparent text-sm font-medium text-white outline-none"
             >
               <option value="1">1 guest</option>
               <option value="2">2 guests</option>

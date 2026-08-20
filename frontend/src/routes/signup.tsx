@@ -4,7 +4,10 @@ import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { Lock, Mail, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/useAuth";
 import { canUseGoogleAuth, renderGoogleButton } from "@/lib/google-auth";
+import { createLocalAccount } from "@/lib/local-auth";
+import { setStoredUser, type AppUser } from "@/lib/user-session";
 
 export const Route = createFileRoute("/signup")({
   head: () => ({
@@ -21,6 +24,7 @@ export const Route = createFileRoute("/signup")({
 
 function SignUpPage() {
   const navigate = useNavigate();
+  const { refreshUser } = useAuth();
   const [loading, setLoading] = useState(false);
   const googleBtnRef = useRef<HTMLDivElement | null>(null);
 
@@ -31,13 +35,14 @@ function SignUpPage() {
     renderGoogleButton({
       container: el,
       variant: "signup",
-      onSuccess: () => {
+      onSuccess: async () => {
+        await refreshUser();
         toast.success("Signed up with Google.");
         navigate({ to: "/" });
       },
-      onError: (err) => toast.error(err.message),
+      onError: () => toast.error("Google sign-up is unavailable right now. Please use email."),
     });
-  }, [navigate]);
+  }, [navigate, refreshUser]);
 
   return (
     <div className="min-h-screen bg-[#fafafa] text-black">
@@ -118,9 +123,7 @@ function SignUpPage() {
                   variant="outline"
                   className="h-12 w-full rounded-xl border-black/15 bg-white text-black hover:bg-black/[0.03]"
                   onClick={() => {
-                    toast.error(
-                      "Google sign-up is not configured. Set VITE_API_BASE_URL and VITE_GOOGLE_CLIENT_ID.",
-                    );
+                    toast.error("Google sign-up is not configured. Please use email.");
                   }}
                 >
                   <span className="mr-2 inline-flex h-5 w-5 items-center justify-center rounded bg-black text-white text-[10px] font-bold">
@@ -138,14 +141,30 @@ function SignUpPage() {
             </div>
 
             <form
-              onSubmit={(e) => {
+              onSubmit={async (e) => {
                 e.preventDefault();
                 setLoading(true);
-                setTimeout(() => {
+                const form = new FormData(e.currentTarget);
+                const fullName = String(form.get("fullName") ?? "");
+                const email = String(form.get("email") ?? "");
+                const password = String(form.get("password") ?? "");
+                const result = createLocalAccount({ fullName, email, password });
+                if (result.user) {
+                  const appUser: AppUser = {
+                    id: result.user.email,
+                    email: result.user.email,
+                    fullName: result.user.fullName,
+                    role: result.user.role,
+                  };
+                  setStoredUser(appUser);
+                  await refreshUser();
                   setLoading(false);
-                  toast.success("Account created (demo).");
+                  toast.success("Account created.");
                   navigate({ to: "/" });
-                }, 550);
+                  return;
+                }
+                setLoading(false);
+                toast.error(result.error ?? "Could not create your account.");
               }}
               className="space-y-4"
             >
@@ -154,6 +173,7 @@ function SignUpPage() {
                   <User className="h-3.5 w-3.5" /> Full name
                 </label>
                 <input
+                  name="fullName"
                   className="h-12 w-full rounded-xl border border-black/10 bg-white px-4 text-sm font-medium text-black outline-none transition focus:border-black/30"
                   placeholder="Your name"
                   autoComplete="name"
@@ -165,6 +185,7 @@ function SignUpPage() {
                   <Mail className="h-3.5 w-3.5" /> Email
                 </label>
                 <input
+                  name="email"
                   type="email"
                   className="h-12 w-full rounded-xl border border-black/10 bg-white px-4 text-sm font-medium text-black outline-none transition focus:border-black/30"
                   placeholder="you@domain.com"
@@ -177,6 +198,7 @@ function SignUpPage() {
                   <Lock className="h-3.5 w-3.5" /> Password
                 </label>
                 <input
+                  name="password"
                   type="password"
                   className="h-12 w-full rounded-xl border border-black/10 bg-white px-4 text-sm font-medium text-black outline-none transition focus:border-black/30"
                   placeholder="••••••••"

@@ -16,6 +16,7 @@ import { Route as SignupRouteImport } from './routes/signup'
 import { Route as RoomsRouteImport } from './routes/rooms'
 import { Route as RefundPolicyRouteImport } from './routes/refund-policy'
 import { Route as RefundRouteImport } from './routes/refund'
+import { Route as RazorpayDemoRouteImport } from './routes/razorpay-demo'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PaymentRouteImport } from './routes/payment'
@@ -87,6 +88,11 @@ const RefundPolicyRoute = RefundPolicyRouteImport.update({
 const RefundRoute = RefundRouteImport.update({
   id: '/refund',
   path: '/refund',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RazorpayDemoRoute = RazorpayDemoRouteImport.update({
+  id: '/razorpay-demo',
+  path: '/razorpay-demo',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProfileRoute = ProfileRouteImport.update({
@@ -294,6 +300,7 @@ export interface FileRoutesByFullPath {
   '/payment': typeof PaymentRoute
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
+  '/razorpay-demo': typeof RazorpayDemoRoute
   '/refund': typeof RefundRoute
   '/refund-policy': typeof RefundPolicyRoute
   '/rooms': typeof RoomsRouteWithChildren
@@ -338,6 +345,7 @@ export interface FileRoutesByTo {
   '/payment': typeof PaymentRoute
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
+  '/razorpay-demo': typeof RazorpayDemoRoute
   '/refund': typeof RefundRoute
   '/refund-policy': typeof RefundPolicyRoute
   '/signup': typeof SignupRoute
@@ -384,6 +392,7 @@ export interface FileRoutesById {
   '/payment': typeof PaymentRoute
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
+  '/razorpay-demo': typeof RazorpayDemoRoute
   '/refund': typeof RefundRoute
   '/refund-policy': typeof RefundPolicyRoute
   '/rooms': typeof RoomsRouteWithChildren
@@ -432,6 +441,7 @@ export interface FileRouteTypes {
     | '/payment'
     | '/privacy'
     | '/profile'
+    | '/razorpay-demo'
     | '/refund'
     | '/refund-policy'
     | '/rooms'
@@ -476,6 +486,7 @@ export interface FileRouteTypes {
     | '/payment'
     | '/privacy'
     | '/profile'
+    | '/razorpay-demo'
     | '/refund'
     | '/refund-policy'
     | '/signup'
@@ -521,6 +532,7 @@ export interface FileRouteTypes {
     | '/payment'
     | '/privacy'
     | '/profile'
+    | '/razorpay-demo'
     | '/refund'
     | '/refund-policy'
     | '/rooms'
@@ -568,6 +580,7 @@ export interface RootRouteChildren {
   PaymentRoute: typeof PaymentRoute
   PrivacyRoute: typeof PrivacyRoute
   ProfileRoute: typeof ProfileRoute
+  RazorpayDemoRoute: typeof RazorpayDemoRoute
   RefundRoute: typeof RefundRoute
   RefundPolicyRoute: typeof RefundPolicyRoute
   RoomsRoute: typeof RoomsRouteWithChildren
@@ -629,6 +642,13 @@ declare module '@tanstack/react-router' {
       path: '/refund'
       fullPath: '/refund'
       preLoaderRoute: typeof RefundRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/razorpay-demo': {
+      id: '/razorpay-demo'
+      path: '/razorpay-demo'
+      fullPath: '/razorpay-demo'
+      preLoaderRoute: typeof RazorpayDemoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/profile': {
@@ -979,6 +999,7 @@ const rootRouteChildren: RootRouteChildren = {
   PaymentRoute: PaymentRoute,
   PrivacyRoute: PrivacyRoute,
   ProfileRoute: ProfileRoute,
+  RazorpayDemoRoute: RazorpayDemoRoute,
   RefundRoute: RefundRoute,
   RefundPolicyRoute: RefundPolicyRoute,
   RoomsRoute: RoomsRouteWithChildren,

@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { Building2, Lock, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/useAuth";
 import { canUseGoogleAuth, renderGoogleButton } from "@/lib/google-auth";
 
 export const Route = createFileRoute("/login")({
@@ -21,6 +22,7 @@ export const Route = createFileRoute("/login")({
 
 function MainLoginPage() {
   const navigate = useNavigate();
+  const { refreshUser, signInWithPassword } = useAuth();
   const [loading, setLoading] = useState(false);
   const googleBtnRef = useRef<HTMLDivElement | null>(null);
 
@@ -31,13 +33,14 @@ function MainLoginPage() {
     renderGoogleButton({
       container: el,
       variant: "signin",
-      onSuccess: () => {
+      onSuccess: async () => {
+        await refreshUser();
         toast.success("Signed in with Google.");
         navigate({ to: "/" });
       },
-      onError: (err) => toast.error(err.message),
+      onError: () => toast.error("Google sign-in is unavailable right now. Please use email."),
     });
-  }, [navigate]);
+  }, [navigate, refreshUser]);
 
   return (
     <div className="min-h-screen bg-[#fafafa] text-black">
@@ -113,9 +116,7 @@ function MainLoginPage() {
                   variant="outline"
                   className="h-12 w-full rounded-lg border-black/15 bg-white text-black hover:bg-black/[0.03]"
                   onClick={() => {
-                    toast.error(
-                      "Google sign-in is not configured. Set VITE_API_BASE_URL and VITE_GOOGLE_CLIENT_ID.",
-                    );
+                    toast.error("Google sign-in is not configured. Please use email.");
                   }}
                 >
                   <GoogleIcon />
@@ -131,14 +132,21 @@ function MainLoginPage() {
             </div>
 
             <form
-              onSubmit={(e) => {
+              onSubmit={async (e) => {
                 e.preventDefault();
                 setLoading(true);
-                setTimeout(() => {
+                const form = new FormData(e.currentTarget);
+                const email = String(form.get("email") ?? "");
+                const password = String(form.get("password") ?? "");
+                const result = await signInWithPassword({ email, password });
+                if (result.user) {
                   setLoading(false);
-                  toast.success("Signed in (demo).");
+                  toast.success("Signed in.");
                   navigate({ to: "/" });
-                }, 450);
+                  return;
+                }
+                setLoading(false);
+                toast.error(result.error ?? "Please check your email and password.");
               }}
               className="space-y-4"
             >
@@ -147,6 +155,8 @@ function MainLoginPage() {
                   <Mail className="h-3.5 w-3.5" /> Email
                 </label>
                 <input
+                  name="email"
+                  type="email"
                   className="h-12 w-full rounded-lg border border-black/10 bg-white px-4 text-sm font-medium text-black outline-none transition focus:border-black/30"
                   placeholder="you@domain.com"
                   autoComplete="email"
@@ -158,6 +168,7 @@ function MainLoginPage() {
                   <Lock className="h-3.5 w-3.5" /> Password
                 </label>
                 <input
+                  name="password"
                   type="password"
                   className="h-12 w-full rounded-lg border border-black/10 bg-white px-4 text-sm font-medium text-black outline-none transition focus:border-black/30"
                   placeholder="Password"

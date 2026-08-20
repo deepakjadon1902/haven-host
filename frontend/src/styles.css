@@ -128,6 +128,12 @@
     background: var(--gold);
     color: #000;
   }
+
+  select option,
+  select optgroup {
+    background-color: #fff;
+    color: #000;
+  }
 }
 
 @layer utilities {
